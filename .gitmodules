@@ -1,0 +1,3 @@
+[submodule ".claude-defaults"]
+	path = .claude-defaults
+	url = git@github.com-sk-quantfidential:sk-quantfidential/claude-defaults.git

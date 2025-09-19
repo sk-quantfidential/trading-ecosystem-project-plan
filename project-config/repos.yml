@@ -1,0 +1,226 @@
+# Trading Ecosystem Repository Configuration
+
+repositories:
+  # Core Services (10 repositories)
+  - name: audit-correlator-go
+    type: core-service
+    language: go
+    domain: audit-correlation
+    purpose: Event correlation and system behavior analysis for regulatory compliance
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.10
+      - TSE-0001.12c
+    status: active
+    data_adapter: audit-data-adapter-go
+
+  - name: custodian-simulator-go
+    type: core-service
+    language: go
+    domain: custody-settlement
+    purpose: Asset custody and settlement simulation with multi-asset support
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.6
+    status: active
+    data_adapter: custodian-data-adapter-go
+
+  - name: exchange-simulator-go
+    type: core-service
+    language: go
+    domain: exchange-trading
+    purpose: Exchange connectivity simulation with order matching and account management
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.5a
+      - TSE-0001.5b
+    status: active
+    data_adapter: exchange-data-adapter-go
+
+  - name: market-data-simulator-go
+    type: core-service
+    language: go
+    domain: market-data
+    purpose: Market data generation and distribution with chaos injection capabilities
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.4
+    status: active
+    data_adapter: market-data-adapter-go
+
+  - name: orchestrator-docker
+    type: infrastructure
+    language: shell
+    domain: orchestration
+    purpose: Docker orchestration for building, starting, stopping and monitoring component health
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.3a
+    status: active
+
+  - name: project-plan
+    type: coordination
+    language: documentation
+    domain: project-management
+    purpose: Central documentation, configuration, and multi-component project coordination
+    epic: epic-TSE-0001
+    milestones:
+      - all
+    status: active
+
+  - name: protobuf-schemas
+    type: infrastructure
+    language: protobuf
+    domain: api-contracts
+    purpose: Shared protocol buffer schemas and client library generation
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.2
+    status: completed
+
+  - name: risk-monitor-py
+    type: core-service
+    language: python
+    domain: risk-management
+    purpose: Real-time risk monitoring and alert system with production API integration
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.7a
+      - TSE-0001.7b
+    status: active
+    data_adapter: risk-data-adapter-py
+
+  - name: test-coordinator-py
+    type: core-service
+    language: python
+    domain: chaos-testing
+    purpose: Scenario orchestration and chaos testing framework coordination
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.9
+      - TSE-0001.12d
+    status: active
+    data_adapter: test-coordination-adapter-py
+
+  - name: trading-system-engine-py
+    type: core-service
+    language: python
+    domain: trading-strategies
+    purpose: Core trading engine with systematic trading strategies and portfolio management
+    epic: epic-TSE-0001
+    milestones:
+      - TSE-0001.8
+    status: active
+    data_adapter: trading-data-adapter-py
+
+  # Data Adapters (7 repositories) - Clean Architecture
+  - name: audit-data-adapter-go
+    type: data-adapter
+    language: go
+    domain: audit-correlation
+    purpose: Data persistence adapter for audit correlator with event ingestion and correlation analysis
+    epic: epic-TSE-0003
+    milestones:
+      - TSE-0003.0
+    status: foundation-complete
+    serves: audit-correlator-go
+    schema_namespace: audit
+
+  - name: custodian-data-adapter-go
+    type: data-adapter
+    language: go
+    domain: custody-settlement
+    purpose: Data persistence adapter for custodian simulator with asset custody and settlement processing
+    epic: epic-TSE-0003
+    milestones:
+      - TSE-0003.0
+    status: foundation-complete
+    serves: custodian-simulator-go
+    schema_namespace: custodian
+
+  - name: exchange-data-adapter-go
+    type: data-adapter
+    language: go
+    domain: exchange-trading
+    purpose: Data persistence adapter for exchange simulator with account management and order lifecycle
+    epic: epic-TSE-0003
+    milestones:
+      - TSE-0003.0
+    status: foundation-complete
+    serves: exchange-simulator-go
+    schema_namespace: exchange
+
+  - name: market-data-adapter-go
+    type: data-adapter
+    language: go
+    domain: market-data
+    purpose: Data persistence adapter for market data simulator with price feeds and scenario management
+    epic: epic-TSE-0003
+    milestones:
+      - TSE-0003.0
+    status: foundation-complete
+    serves: market-data-simulator-go
+    schema_namespace: market_data
+
+  - name: risk-data-adapter-py
+    type: data-adapter
+    language: python
+    domain: risk-management
+    purpose: Data persistence adapter for risk monitor with position aggregation and risk monitoring
+    epic: epic-TSE-0003
+    milestones:
+      - TSE-0003.0
+    status: foundation-complete
+    serves: risk-monitor-py
+    schema_namespace: risk
+
+  - name: test-coordination-adapter-py
+    type: data-adapter
+    language: python
+    domain: chaos-testing
+    purpose: Data persistence adapter for test coordinator with scenario management and execution tracking
+    epic: epic-TSE-0003
+    milestones:
+      - TSE-0003.0
+    status: foundation-complete
+    serves: test-coordinator-py
+    schema_namespace: test_coordination
+
+  - name: trading-data-adapter-py
+    type: data-adapter
+    language: python
+    domain: trading-strategies
+    purpose: Data persistence adapter for trading engine with strategy management and portfolio tracking
+    epic: epic-TSE-0003
+    milestones:
+      - TSE-0003.0
+    status: foundation-complete
+    serves: trading-system-engine-py
+    schema_namespace: trading
+
+# Data Architecture Summary
+data_architecture:
+  shared_infrastructure:
+    redis:
+      instance_count: 1
+      namespacing: "prefix-based (market:*, exchange:*, custodian:*, risk:*, trading:*, test:*, audit:*)"
+    postgresql:
+      instance_count: 1
+      namespacing: "schema-based (market_data, exchange, custodian, risk, trading, test_coordination, audit)"
+
+  adapter_pattern:
+    principle: "Clean Architecture with domain-driven APIs"
+    isolation: "No shared tables between components"
+    api_design: "Business concepts, not database artifacts"
+
+# Statistics
+project_stats:
+  total_repositories: 16
+  core_services: 7
+  data_adapters: 7
+  infrastructure: 2
+  languages:
+    go: 8
+    python: 6
+    protobuf: 1
+    shell: 1

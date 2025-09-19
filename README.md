@@ -19,7 +19,7 @@ This repository contains the complete project specifications, architecture docum
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   Exchange      │    │   Custodian      │    │  Market Data    │
 │   Simulator     │    │   Simulator      │    │   Service       │
-│   (Go/Rust)     │    │   (Go/Rust)      │    │   (Go/Rust)     │
+│   (Go)          │    │   (Go)           │    │   (Go)          │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                       │                       │
          └───────────────────────┼───────────────────────┘
@@ -65,7 +65,7 @@ This repository contains the complete project specifications, architecture docum
 
 ## 🔧 Technology Stack
 
-- **Microservices**: Go/Rust for performance-critical components, Python for algorithms
+- **Microservices**: Go for performance-critical components, Python for algorithms
 - **Communication**: gRPC for service-to-service, REST for chaos injection and monitoring
 - **Observability**: OpenTelemetry distributed tracing with Prometheus metrics
 - **Dashboards**: Grafana for risk monitoring and audit correlation visualization
@@ -190,12 +190,65 @@ This project uses Claude Code for accelerated development. See [`CLAUDE_WORKFLOW
 
 [Specify your license here]
 
-## 🔗 Related Repositories
+## 🗂️ Repository Structure
 
-- **Protobuf Schemas**: [Link to protobuf definitions repo]
-- **Implementation Code**: [Link to actual codebase when created]
-- **Claude Code Configs**: [Link to claude-code configuration repo]
+This is a multi-component project with **16 separate repositories** following Clean Architecture principles:
+
+### Core Services (7 repositories)
+- **audit-correlator-go**: Event correlation and system behavior analysis
+- **custodian-simulator-go**: Asset custody and settlement simulation
+- **exchange-simulator-go**: Exchange connectivity simulation with order matching
+- **market-data-simulator-go**: Market data generation and distribution
+- **risk-monitor-py**: Real-time risk monitoring and alert system
+- **test-coordinator-py**: Scenario orchestration and chaos testing framework
+- **trading-system-engine-py**: Core trading engine with systematic strategies
+
+### Data Adapters (7 repositories)
+Following Clean Architecture, each core service has a dedicated data adapter providing domain-specific persistence APIs:
+
+- **audit-data-adapter-go**: Event ingestion, correlation analysis, audit reporting
+- **custodian-data-adapter-go**: Asset custody, settlement processing, reconciliation
+- **exchange-data-adapter-go**: Account management, order lifecycle, trade execution
+- **market-data-adapter-go**: Price feeds, historical data, scenario management
+- **risk-data-adapter-py**: Position aggregation, risk monitoring, alert management
+- **test-coordination-adapter-py**: Scenario management, execution tracking, validation
+- **trading-data-adapter-py**: Strategy management, portfolio tracking, performance analytics
+
+### Infrastructure & Coordination (2 repositories)
+- **protobuf-schemas**: Shared protocol buffer schemas and client libraries ✅ **Completed TSE-0001.2**
+- **orchestrator-docker**: Docker orchestration for deployment and health monitoring
+
+### Data Architecture
+- **Shared Infrastructure**: Single Redis + Single PostgreSQL instances (MVP simplification)
+- **Logical Separation**: PostgreSQL schema namespacing (`market_data`, `exchange`, `custodian`, `risk`, `trading`, `test_coordination`, `audit`)
+- **Redis Key Prefixing**: (`market:*`, `exchange:*`, `custodian:*`, `risk:*`, `trading:*`, `test:*`, `audit:*`)
+- **Domain-Driven APIs**: Each adapter exposes business concepts, not database artifacts
+
+## 🚀 Current Status
+
+**Epic**: TSE-0001 Foundation Services & Infrastructure
+**Infrastructure Foundation Phase**: ✅ **4/4 milestones completed**
+- TSE-0001.1a (Go Services Bootstrapping) ✅
+- TSE-0001.1b (Python Services Bootstrapping) ✅
+- TSE-0001.1c (Schema Service Bootstrapping) ✅
+- TSE-0001.2 (Protocol Buffer Integration) ✅
+
+**Data Adapter Foundation**: ✅ **TSE-0003.0 Completed**
+- All 7 data adapter repositories created with comprehensive documentation
+- `feature/TSE-0003.0-data-adapter-foundation` branches established
+- README.md files created for each adapter with Clean Architecture compliance
+
+**Next Milestone**: TSE-0001.3a (Core Infrastructure Setup)
+
+## 🔗 Related Documentation
+
+- **Architecture Details**: [`DATA_ARCHITECTURE.md`](DATA_ARCHITECTURE.md) - Complete data persistence architecture
+- **Repository Inventory**: [`REPOSITORIES.md`](REPOSITORIES.md) - Detailed component mapping and integration points
+- **Master TODO**: [`TODO-MASTER.md`](TODO-MASTER.md) - Cross-component milestone tracking
+- **Configuration**: [`CLAUDE.md`](CLAUDE.md) - Claude Code project configuration
 
 ---
 
-**Note**: This repository contains project specifications and planning documents. The actual implementation will be in separate repositories following the microservices architecture outlined in the documentation.
+**Project Type**: Multi-component with Clean Architecture
+**Architecture**: Microservices with domain-driven data adapters
+**Epic Context**: TSE-0001 Foundation Services & Infrastructure

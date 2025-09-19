@@ -76,7 +76,7 @@
 - **Tech Stack**: Python
 - **Epic Participation**: TSE-0001.9 (Test Coordination Framework), TSE-0001.12d (Chaos Testing Integration)
 - **Status**: Active
-- **Data Persistence**: test-coordination-adapter-py
+- **Data Persistence**: test-coordinator-data-adapter-py
 
 ### trading-system-engine-py
 - **Repository**: ./trading-system-engine-py
@@ -133,8 +133,8 @@
 - **Serves**: risk-monitor-py
 - **Schema Namespace**: risk
 
-### test-coordination-adapter-py
-- **Repository**: ./test-coordination-adapter-py
+### test-coordinator-data-adapter-py
+- **Repository**: ./test-coordinator-data-adapter-py
 - **Purpose**: Data persistence adapter for test coordinator with scenario management and execution tracking
 - **Tech Stack**: Python, PostgreSQL, Redis
 - **Epic Participation**: TSE-0001.9 (Test Coordination Framework)
@@ -223,7 +223,7 @@ Test Coordinator ← Test Coordination Adapter ← Redis/PostgreSQL
 
 ### Data Adapters
 - **Go Data Adapters**: audit-data-adapter-go, custodian-data-adapter-go, exchange-data-adapter-go, market-data-adapter-go
-- **Python Data Adapters**: risk-data-adapter-py, test-coordination-adapter-py, trading-data-adapter-py
+- **Python Data Adapters**: risk-data-adapter-py, test-coordinator-data-adapter-py, trading-data-adapter-py
 
 ### Infrastructure
 - **Communication**: protobuf-schemas for all inter-service contracts

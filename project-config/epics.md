@@ -25,7 +25,7 @@ epics:
       - audit-data-adapter-go
       - risk-data-adapter-py
       - trading-data-adapter-py
-      - test-coordination-adapter-py
+      - test-coordinator-data-adapter-py
     labels:
       - foundation
       - infrastructure
@@ -52,7 +52,7 @@ epics:
       - audit-data-adapter-go
       - risk-data-adapter-py
       - trading-data-adapter-py
-      - test-coordination-adapter-py
+      - test-coordinator-data-adapter-py
       - project-plan
     labels:
       - data-architecture

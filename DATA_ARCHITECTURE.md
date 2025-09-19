@@ -112,7 +112,7 @@ This document defines the data persistence architecture for the Trading Ecosyste
 - **Redis**: Active scenario state, execution locks
 - **PostgreSQL**: Scenario definitions, execution logs, test reports
 
-**Required Adapter**: `test-coordination-adapter-py`
+**Required Adapter**: `test-coordinator-data-adapter-py`
 
 ### TSE-0001.10: Audit Correlator (audit-correlator-go)
 
@@ -165,7 +165,7 @@ Based on the analysis, the following new repositories are required:
    - Domain: Strategy execution, portfolio management
    - Key APIs: Strategy management, portfolio tracking, performance analytics
 
-7. **`test-coordination-adapter-py`**
+7. **`test-coordinator-data-adapter-py`**
    - Component: test-coordinator-py
    - Domain: Chaos testing, scenario orchestration
    - Key APIs: Scenario management, execution tracking, validation

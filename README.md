@@ -211,7 +211,7 @@ Following Clean Architecture, each core service has a dedicated data adapter pro
 - **exchange-data-adapter-go**: Account management, order lifecycle, trade execution
 - **market-data-adapter-go**: Price feeds, historical data, scenario management
 - **risk-data-adapter-py**: Position aggregation, risk monitoring, alert management
-- **test-coordination-adapter-py**: Scenario management, execution tracking, validation
+- **test-coordinator-data-adapter-py**: Scenario management, execution tracking, validation
 - **trading-data-adapter-py**: Strategy management, portfolio tracking, performance analytics
 
 ### Infrastructure & Coordination (2 repositories)

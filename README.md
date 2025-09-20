@@ -244,8 +244,13 @@ Following Clean Architecture, each core service has a dedicated data adapter pro
 
 - **Architecture Details**: [`DATA_ARCHITECTURE.md`](DATA_ARCHITECTURE.md) - Complete data persistence architecture
 - **Repository Inventory**: [`REPOSITORIES.md`](REPOSITORIES.md) - Detailed component mapping and integration points
+- **Development Setup**: [`DEVELOPMENT_SETUP.md`](DEVELOPMENT_SETUP.md) - Comprehensive development environment setup guide
 - **Master TODO**: [`TODO-MASTER.md`](TODO-MASTER.md) - Cross-component milestone tracking
 - **Configuration**: [`CLAUDE.md`](CLAUDE.md) - Claude Code project configuration
+
+## 🛠️ Development Tools
+
+- **Environment Verification**: [`scripts/verify_setup.py`](scripts/verify_setup.py) - Automated development environment validation
 
 ---
 

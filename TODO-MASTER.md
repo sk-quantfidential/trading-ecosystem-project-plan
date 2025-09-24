@@ -104,15 +104,17 @@
 #### Milestone TSE-0001.3a: Core Infrastructure Setup
 **Status**: Not Started
 **Components**: Infrastructure
-**Goal**: Establish service discovery and configuration infrastructure
+**Goal**: Establish shared data infrastructure and service discovery
 
 **Tasks**:
-- [ ] Redis deployment for service discovery
-- [ ] Basic configuration service for endpoints and parameters
+- [ ] Redis deployment for service discovery and caching
+- [ ] PostgreSQL deployment for persistent data storage
 - [ ] Docker Compose orchestration with proper networking
 - [ ] Service registry schema and APIs
+- [ ] Database connection health checks
+- [ ] Basic configuration service for endpoints and parameters
 
-**BDD Acceptance**: Infrastructure services are running and accessible
+**BDD Acceptance**: Redis and PostgreSQL services can be brought up and down with Docker, with a docker network configured, and are discoverable and in good health
 
 **Dependencies**: TSE-0001.2 (Protocol Buffer Integration)
 

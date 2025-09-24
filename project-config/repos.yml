@@ -100,7 +100,7 @@ repositories:
       - TSE-0001.9
       - TSE-0001.12d
     status: active
-    data_adapter: test-coordination-adapter-py
+    data_adapter: test-coordinator-data-adapter-py
 
   - name: trading-system-engine-py
     type: core-service
@@ -174,7 +174,7 @@ repositories:
     serves: risk-monitor-py
     schema_namespace: risk
 
-  - name: test-coordination-adapter-py
+  - name: test-coordinator-data-adapter-py
     type: data-adapter
     language: python
     domain: chaos-testing

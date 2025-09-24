@@ -75,7 +75,7 @@ repositories:
   # Python Data Adapters
   - risk-data-adapter-py
   - trading-data-adapter-py
-  - test-coordination-adapter-py
+  - test-coordinator-data-adapter-py
 
   # Documentation
   - project-plan

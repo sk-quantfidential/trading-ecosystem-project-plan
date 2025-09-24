@@ -224,30 +224,6 @@ Following Clean Architecture, each core service has a dedicated data adapter pro
 - **Redis Key Prefixing**: (`market:*`, `exchange:*`, `custodian:*`, `risk:*`, `trading:*`, `test:*`, `audit:*`)
 - **Domain-Driven APIs**: Each adapter exposes business concepts, not database artifacts
 
-## 🚀 Current Status
-
-**Epic**: TSE-0001 Foundation Services & Infrastructure
-**Infrastructure Foundation Phase**: ✅ **4/4 milestones completed**
-- TSE-0001.1a (Go Services Bootstrapping) ✅
-- TSE-0001.1b (Python Services Bootstrapping) ✅
-- TSE-0001.1c (Schema Service Bootstrapping) ✅
-- TSE-0001.2 (Protocol Buffer Integration) ✅
-
-**Data Adapter Foundation**: ✅ **TSE-0003.0 Completed**
-- All 7 data adapter repositories created with comprehensive documentation
-- `feature/TSE-0003.0-data-adapter-foundation` branches established
-- README.md files created for each adapter with Clean Architecture compliance
-
-**Next Milestone**: TSE-0001.3a (Core Infrastructure Setup)
-
-## 🔗 Related Documentation
-
-- **Architecture Details**: [`DATA_ARCHITECTURE.md`](DATA_ARCHITECTURE.md) - Complete data persistence architecture
-- **Repository Inventory**: [`REPOSITORIES.md`](REPOSITORIES.md) - Detailed component mapping and integration points
-- **Development Setup**: [`DEVELOPMENT_SETUP.md`](DEVELOPMENT_SETUP.md) - Comprehensive development environment setup guide
-- **Master TODO**: [`TODO-MASTER.md`](TODO-MASTER.md) - Cross-component milestone tracking
-- **Configuration**: [`CLAUDE.md`](CLAUDE.md) - Claude Code project configuration
-
 ## 🛠️ Development Tools
 
 - **Environment Verification**: [`scripts/verify_setup.py`](scripts/verify_setup.py) - Automated development environment validation

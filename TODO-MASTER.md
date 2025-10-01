@@ -10,11 +10,12 @@
 
 ### Progress Summary:
 - **Infrastructure Foundation Phase**: ✅ **COMPLETED** - All 7 milestones done (TSE-0001.1a ✅, TSE-0001.1b ✅, TSE-0001.1c ✅, TSE-0001.2 ✅, TSE-0001.3a ✅, TSE-0001.3b ✅, TSE-0001.3c ✅)
-- **Data Architecture & Deployment Phase**: 0 of 1 milestones completed
+- **Data Architecture & Deployment Phase**: ⚡ **IN PROGRESS** - TSE-0001.4 at 75% (3 of 4 Go services complete: audit ✅, custodian ✅, exchange ✅)
 - **Core Services Phase**: 0 of 10 milestones completed
 - **Observability & Integration Phase**: 0 of 8 milestones completed
 
-**Next Milestone**: TSE-0001.4 (Data Adapters & Orchestrator) - Ready to begin Data Architecture & Deployment Phase
+**Current Milestone**: TSE-0001.4 (Data Adapters & Orchestrator) - 3/4 Go services deployed, market-data pending
+**Completed**: TSE-0001.4 (audit), TSE-0001.4.1 (custodian), TSE-0001.4.2 (exchange) ✅
 
 ---
 
@@ -262,50 +263,59 @@
 ### 🔧 Data Architecture & Deployment Phase
 
 #### Milestone TSE-0001.4: Data Adapters & Orchestrator Refactoring
-**Status**: ⚡ **IN PROGRESS** - audit-data-adapter-go foundation complete, integration pattern established
-**Components**: audit-data-adapter-go (✅), audit-correlator-go (next), All Python and Go services, orchestrator-docker
+**Status**: ⚡ **IN PROGRESS** - 3 of 4 Go services complete (audit ✅, custodian ✅, exchange ✅), market-data pending
+**Components**: audit-data-adapter-go (✅), custodian-data-adapter-go (✅), exchange-data-adapter-go (✅), All Go services, orchestrator-docker
 **Goal**: Implement clean architecture data adapters and comprehensive deployment orchestration
 
-**Completed Foundation**:
-- [x] **audit-data-adapter-go**: ✅ **COMPLETED** - Production-ready data adapter with comprehensive behavior testing
-  - [x] Repository pattern with clean interfaces (AuditEventRepository, ServiceDiscoveryRepository, CacheRepository, CorrelationRepository)
-  - [x] PostgreSQL integration with audit_correlator schema and UUID support
-  - [x] Redis service discovery with ACL authentication and namespace isolation
-  - [x] Comprehensive BDD testing framework (83% success rate, 24/29 tests passing)
-  - [x] Environment configuration system with .env support and orchestrator integration
-  - [x] Ecosystem audit behavior tests for cross-service correlation and flow tracking
+**Completed Sub-Milestones**:
+- [x] **TSE-0001.4 (audit)**: ✅ **COMPLETED** (2025-09-30) - audit-correlator-go + audit-data-adapter-go deployed
+  - [x] audit-data-adapter-go: Repository pattern with clean interfaces, PostgreSQL/Redis integration, 83% test success rate
+  - [x] audit-correlator-go: DataAdapter integrated, deployed to orchestrator (172.20.0.80), health checks passing
+
+- [x] **TSE-0001.4.1 (custodian)**: ✅ **COMPLETED** (2025-10-01) - custodian-simulator-go + custodian-data-adapter-go deployed
+  - [x] custodian-data-adapter-go: 3 domain models (Position, Settlement, Balance), 3 repositories, factory pattern
+  - [x] custodian-simulator-go: DataAdapter integrated, deployed to orchestrator (172.20.0.81), smoke tests passing
+  - [x] PostgreSQL: custodian schema (3 tables), custodian_adapter user with permissions
+  - [x] Redis: custodian-adapter ACL user with custodian:* namespace
+
+- [x] **TSE-0001.4.2 (exchange)**: ✅ **COMPLETED** (2025-10-01) - exchange-simulator-go + exchange-data-adapter-go deployed
+  - [x] exchange-data-adapter-go: 4 domain models (Account, Order, Trade, Balance), 6 repositories (including ServiceDiscovery, Cache)
+  - [x] exchange-simulator-go: DataAdapter integrated, deployed to orchestrator (172.20.0.82), smoke tests passing (5/5)
+  - [x] PostgreSQL: exchange schema (4 tables), exchange_adapter user with permissions
+  - [x] Redis: exchange-adapter ACL user with exchange:* namespace
+  - [x] Smoke tests: Config tests (3/3), DataAdapter tests (2/2), 4 deferred to future epic
+  - [x] Documentation: Comprehensive PULL_REQUEST.md files, TODO.md updates, future work documented
 
 **In Progress**:
-- [ ] **audit-correlator-go**: ⚡ **READY FOR INTEGRATION** - Test infrastructure established, integration tasks defined
-  - [x] Task 0: Test infrastructure and behavior validation (Makefile, unit/integration tests, JSON serialization fixes)
-  - [ ] Task 1: Remove direct database dependencies (Redis/PostgreSQL imports)
-  - [ ] Task 2: Refactor infrastructure layer to use audit-data-adapter-go DataAdapter interfaces
-  - [ ] Task 3: Update service layer to use repository patterns
-  - [ ] Task 4: Test integration with shared orchestrator services
-  - [ ] Task 5: Configuration integration and lifecycle management
+- [ ] **TSE-0001.4.3 (market-data)**: ⏳ **PENDING** - market-data-simulator-go + market-data-adapter-go
+  - [ ] market-data-adapter-go: Create data adapter with price history, subscription management repositories
+  - [ ] market-data-simulator-go: DataAdapter integration, orchestrator deployment
+  - [ ] PostgreSQL: market_data schema, market_data_adapter user
+  - [ ] Redis: market-data-adapter ACL user
 
 **Remaining Tasks**:
-- [ ] **Go Services Data Adapters**: Apply audit-data-adapter-go integration pattern to remaining services
-  - [ ] custodian-simulator-go data adapter integration
-  - [ ] exchange-simulator-go data adapter integration
-  - [ ] market-data-simulator-go data adapter integration
-- [ ] **Python Services Data Adapters**: Create Python equivalent of audit-data-adapter-go
+- [ ] **Python Services Data Adapters**: Create Python equivalent pattern
   - [ ] Create audit-data-adapter-py component with repository patterns
   - [ ] risk-monitor-py data adapter integration
   - [ ] trading-system-engine-py data adapter integration
   - [ ] test-coordinator-py data adapter integration
-- [ ] **Orchestrator Enhancement**: Update orchestrator-docker for full ecosystem deployment
-  - [ ] Build system for all components
-  - [ ] Deployment orchestration with health monitoring
+- [ ] **Orchestrator Enhancement**: Full ecosystem deployment
+  - [x] Build system for Go components (audit, custodian, exchange)
+  - [x] Deployment orchestration with health monitoring
   - [ ] Single-command ecosystem startup and teardown
-  - [ ] Service dependency management and startup ordering
-- [ ] **Integration Testing**: Cross-component audit validation and ecosystem behavior tests
-- [ ] **Documentation**: Complete architecture documentation for data adapter pattern
+  - [x] Service dependency management and startup ordering
+- [ ] **Integration Testing**: Cross-component validation
+  - [x] Smoke tests for exchange-simulator (5 passing, 4 deferred)
+  - [ ] Full BDD tests (~2000-3000 LOC per adapter, 50+ scenarios)
+- [ ] **Documentation**: Complete architecture documentation
+  - [x] Exchange data adapter pattern documented (PULL_REQUEST.md)
+  - [ ] Python data adapter pattern documentation
 
-**Current Status**:
-- **audit-data-adapter-go**: ✅ 83% test success rate, ecosystem audit capabilities operational
-- **audit-correlator-go**: ⚡ Test infrastructure ready (10 unit tests, 5 integration tests), integration tasks defined
-- **Integration Pattern**: Established and validated, ready to replicate across all services
+**Current Status** (2025-10-01):
+- **audit-correlator-go**: ✅ Deployed and healthy (172.20.0.80)
+- **custodian-simulator-go**: ✅ Deployed and healthy (172.20.0.81)
+- **exchange-simulator-go**: ✅ Deployed and healthy (172.20.0.82)
+- **Integration Pattern**: ✅ Proven across 3 Go services, ready for market-data and Python services
 
 **BDD Acceptance**: All services access databases only through public data-adapter interfaces, and the entire ecosystem can be built and deployed with single commands
 

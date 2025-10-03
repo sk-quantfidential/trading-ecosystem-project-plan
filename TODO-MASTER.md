@@ -10,12 +10,12 @@
 
 ### Progress Summary:
 - **Infrastructure Foundation Phase**: ✅ **COMPLETED** - All 7 milestones done (TSE-0001.1a ✅, TSE-0001.1b ✅, TSE-0001.1c ✅, TSE-0001.2 ✅, TSE-0001.3a ✅, TSE-0001.3b ✅, TSE-0001.3c ✅)
-- **Data Architecture & Deployment Phase**: ✅ **COMPLETED** - TSE-0001.4 at 100% (4 of 4 Go services complete: audit ✅, custodian ✅, exchange ✅, market-data ✅)
+- **Data Architecture & Deployment Phase**: 🔄 **IN PROGRESS** - TSE-0001.4 at 60% (5 of 8 services complete: audit ✅, custodian ✅, exchange ✅, market-data ✅, risk-monitor ✅)
 - **Core Services Phase**: 0 of 10 milestones completed
 - **Observability & Integration Phase**: 0 of 8 milestones completed
 
-**Current Milestone**: TSE-0001.5 (Market Data Foundation) - Ready to start
-**Completed**: TSE-0001.4 (audit), TSE-0001.4.1 (custodian), TSE-0001.4.2 (exchange), TSE-0001.4.3 (market-data) ✅
+**Current Milestone**: TSE-0001.4 (Data Adapters) - 60% complete (5/8 services)
+**Completed**: TSE-0001.4 (audit) ✅, TSE-0001.4.1 (custodian) ✅, TSE-0001.4.2 (exchange) ✅, TSE-0001.4.3 (market-data) ✅, TSE-0001.4.4 (risk-monitor) ✅
 
 ---
 
@@ -294,10 +294,18 @@
   - ⏭️ PostgreSQL schema, orchestrator deployment, service layer integration deferred to TSE-0001.5
   - ⏭️ Comprehensive BDD tests (~2000-3000 LOC) deferred to future epic
 
+- [x] **TSE-0001.4.4 (risk-monitor)**: ✅ **COMPLETED** (2025-10-03) - risk-monitor-py + risk-data-adapter-py integrated
+  - [x] risk-data-adapter-py: 6 repository interfaces (61 methods), 4 domain models, stub pattern with graceful degradation
+  - [x] risk-monitor-py: DataAdapter integrated, comprehensive integration tests (8/8 passing)
+  - [x] PostgreSQL: risk schema (4 tables), risk_adapter user with permissions
+  - [x] Redis: risk-adapter ACL user with risk:* namespace and +ping permission
+  - [x] Behavior tests: 20/20 tests passing (PostgreSQL + Redis integration validated)
+  - [x] Unit tests: 44/44 tests passing (no regressions)
+  - [x] Code quality: Fixed datetime deprecation warnings, Redis aclose(), SQLAlchemy text() wrapper
+
 **Remaining Tasks**:
 - [ ] **Python Services Data Adapters**: Create Python equivalent pattern
-  - [ ] Create audit-data-adapter-py component with repository patterns
-  - [ ] risk-monitor-py data adapter integration
+  - [x] risk-monitor-py data adapter integration ✅
   - [ ] trading-system-engine-py data adapter integration
   - [ ] test-coordinator-py data adapter integration
 - [ ] **Orchestrator Enhancement**: Full ecosystem deployment

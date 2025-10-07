@@ -11,11 +11,12 @@
 ### Progress Summary
 - **Infrastructure Foundation Phase**: ✅ **COMPLETED** - All 7 milestones done (TSE-0001.1a ✅, TSE-0001.1b ✅, TSE-0001.1c ✅, TSE-0001.2 ✅, TSE-0001.3a ✅, TSE-0001.3b ✅, TSE-0001.3c ✅)
 - **Data Architecture & Deployment Phase**: ✅ **COMPLETED** - TSE-0001.4 at 100% (8 of 8 services complete: audit ✅, custodian ✅, exchange ✅, market-data ✅, risk-monitor ✅, trading-system-engine ✅, test-coordinator ✅, orchestrator ✅)
+- **Multi-Instance Infrastructure**: ✅ **COMPLETED** - TSE-0001.12.0 at 100% (Named components foundation: 4 repos modified, 8 phases complete)
 - **Core Services Phase**: 0 of 10 milestones completed
 - **Observability & Integration Phase**: 0 of 8 milestones completed
 
 **Current Milestone**: TSE-0001.5 (Market Data Foundation) - Ready to start
-**Completed**: TSE-0001.4 (audit) ✅, TSE-0001.4.1 (custodian) ✅, TSE-0001.4.2 (exchange) ✅, TSE-0001.4.3 (market-data) ✅, TSE-0001.4.4 (risk-monitor) ✅, TSE-0001.4.5 (trading-system-engine) ✅, TSE-0001.4.6 (test-coordinator) ✅
+**Completed**: TSE-0001.4 (audit) ✅, TSE-0001.4.1 (custodian) ✅, TSE-0001.4.2 (exchange) ✅, TSE-0001.4.3 (market-data) ✅, TSE-0001.4.4 (risk-monitor) ✅, TSE-0001.4.5 (trading-system-engine) ✅, TSE-0001.4.6 (test-coordinator) ✅, TSE-0001.12.0 (named components) ✅
 
 ---
 
@@ -370,6 +371,90 @@
 **BDD Acceptance**: All services access databases only through public data-adapter interfaces, and the entire ecosystem can be built and deployed with single commands
 
 **Dependencies**: TSE-0001.3b (Go Services gRPC Integration), TSE-0001.3c (Python Services gRPC Integration)
+
+---
+
+#### Milestone TSE-0001.12.0: Multi-Instance Infrastructure Foundation
+**Status**: ✅ **COMPLETED** (2025-10-07) - All 8 phases complete across 4 repositories
+**Components**: audit-data-adapter-go, audit-correlator-go, orchestrator-docker, project-plan
+**Goal**: Enable multi-instance deployment with named components for Grafana monitoring
+
+**Completed Phases**:
+- [x] **Phase 0 (CRITICAL)**: audit-data-adapter-go configuration foundation
+  - [x] Added ServiceName, ServiceInstanceName, SchemaName, RedisNamespace fields to RepositoryConfig
+  - [x] Implemented deriveSchemaName() and deriveRedisNamespace() functions
+  - [x] Added LogConfiguration() with password masking
+  - [x] Created 6 unit test suites (all passing)
+  - [x] Backward compatibility: SERVICE_INSTANCE_NAME defaults to SERVICE_NAME
+
+- [x] **Phase 1**: audit-correlator-go configuration layer
+  - [x] Added ServiceInstanceName to Config struct
+  - [x] Updated Load() to read SERVICE_INSTANCE_NAME environment variable
+  - [x] Added structured logging with instance context
+  - [x] Build verification successful
+
+- [x] **Phase 2**: Service discovery integration
+  - [x] Updated service registration ID to use ServiceInstanceName
+  - [x] Enhanced metadata with service_type and instance_name fields
+  - [x] Redis keys pattern: services:{service-name}:{instance-id}
+  - [x] Build verification successful
+
+- [x] **Phase 3**: PostgreSQL schema support
+  - [x] Updated all SQL queries (12 functions) for dynamic schema prefix
+  - [x] Added ValidateSchema() for schema existence validation
+  - [x] Multi-tenancy via schema isolation
+  - [x] Build verification successful
+
+- [x] **Phase 4**: Redis namespace support
+  - [x] Updated getCacheKey() for dynamic namespace prefix
+  - [x] Added ValidateNamespace() for namespace write validation
+  - [x] Updated GetKeysByPattern() for namespace-aware operations
+  - [x] Service discovery keys remain global (cross-instance visibility)
+
+- [x] **Phase 5**: Docker deployment configuration
+  - [x] Added SERVICE_INSTANCE_NAME to audit-correlator service
+  - [x] Added volume mappings (data/logs)
+  - [x] Created init-volumes.sh for automated volume initialization
+  - [x] Pre-configured for singleton and multi-instance services
+
+- [x] **Phase 6**: PostgreSQL schema initialization
+  - [x] Created "audit" schema for singleton instance
+  - [x] Maintained "audit_correlator" for backward compatibility
+  - [x] Added automated migration from public to audit schema
+  - [x] Full table structure in both schemas
+  - [x] Permissions for audit_adapter and monitor_user
+
+- [x] **Phase 7**: Health check enhancement
+  - [x] Added Config field to HealthHandler
+  - [x] Created NewHealthHandlerWithConfig() constructor
+  - [x] Health endpoint includes instance information
+  - [x] Response: service, instance, version, environment, timestamp
+
+- [x] **Phase 8**: Grafana dashboards
+  - [x] Created grafana/dashboards directory
+  - [x] Comprehensive README for dashboard setup
+  - [x] Documented Docker Infrastructure and Simulation Entity views
+  - [x] Prometheus scrape configuration examples
+  - [x] PromQL queries for instance-aware monitoring
+
+**Architectural Patterns**:
+- **Schema Derivation**:
+  - Singleton: audit-correlator → "audit" schema
+  - Multi-instance: exchange-OKX → "exchange_okx" schema
+- **Redis Namespace**:
+  - Singleton: audit-correlator → "audit:*" keys
+  - Multi-instance: exchange-OKX → "exchange:OKX:*" keys
+- **Service Discovery**: services:{service-name}:{instance-id}
+
+**Implementation Summary**:
+- **Repositories Modified**: 4 (audit-data-adapter-go, audit-correlator-go, orchestrator-docker, project-plan)
+- **Feature Branch**: feature/TSE-0001.12.0-named-components-foundation
+- **Total Commits**: 11 (3 + 4 + 3 + 1)
+- **Test Results**: All builds successful, 6 unit test suites passing
+
+**BDD Acceptance**: Services support multi-instance deployment with separate PostgreSQL schemas and Redis namespaces, enabling instance-aware Grafana monitoring
+
+**Dependencies**: TSE-0001.4 (Data Adapters & Orchestrator Refactoring)
 
 ---
 

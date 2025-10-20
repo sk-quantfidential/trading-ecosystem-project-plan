@@ -201,6 +201,7 @@
 - ✅ **Production Ready**: Service builds and runs successfully with advanced market data simulation
 - ✅ **Market Data Simulation**: Statistical similarity, scenario simulation (rally/crash/divergence/reverting), quality metrics
 - ✅ **Advanced Features**: Real-time streaming, correlation coefficient validation, comprehensive scenario testing
+- ✅ **Prometheus Metrics Client** (2025-10-09): Clean Architecture metrics with RED pattern (Rate, Errors, Duration), 8 BDD test scenarios passing, low-cardinality labels, /metrics endpoint exposed, ready for TSE-0001.12a integration
 
 ---
 
@@ -512,18 +513,84 @@
 - **Service Discovery**: services:{service-name}:{instance-id}
 
 **Implementation Summary**:
-- **Repositories Modified**: 6 (audit-data-adapter-go, audit-correlator-go, risk-data-adapter-py, risk-monitor-py, orchestrator-docker, project-plan)
+- **Repositories Modified**: 9 (audit-data-adapter-go, audit-correlator-go, risk-data-adapter-py, risk-monitor-py, trading-data-adapter-py, trading-system-engine-py, test-coordinator-data-adapter-py, test-coordinator-py, orchestrator-docker, project-plan)
 - **Feature Branches**:
   - Go: feature/TSE-0001.12.0-named-components-foundation
   - Python: feature/TSE-0001.12.0-named-components-foundation
-- **Total Commits**: 15+ (11 Go + 4+ Python)
+- **Total Commits**: 20+ (11 Go + 9+ Python)
 - **Test Results**:
   - Go: All builds successful, 6 unit test suites passing
-  - Python: 52/52 tests passing (44 existing + 8 integration + 15 startup)
+  - Python risk-monitor-py: 52/52 tests passing (44 existing + 8 integration + 15 startup)
+  - Python trading-system-engine-py: Implementation complete
+  - Python test-coordinator-py: 180/180 tests passing (161 existing + 19 startup)
+  - Python test-coordinator-data-adapter-py: 14/15 derivation tests passing
 
 **BDD Acceptance**: ✅ Services support multi-instance deployment with separate PostgreSQL schemas and Redis namespaces, enabling instance-aware Grafana monitoring. Validated in both Go (audit-correlator-go) and Python (risk-monitor-py) services.
 
 **Dependencies**: TSE-0001.4 (Data Adapters & Orchestrator Refactoring)
+
+---
+
+#### Milestone TSE-0001.12.0b: Prometheus Metrics (Clean Architecture)
+**Status**: ✅ **COMPLETED** (2025-10-10) - All three Python services complete!
+**Components**: risk-monitor-py ✅, trading-system-engine-py ✅, test-coordinator-py ✅
+**Goal**: Add Prometheus metrics using Clean Architecture (port/adapter pattern) to enable future OpenTelemetry migration
+
+**Completed Services**:
+
+**risk-monitor-py** - ✅ **COMPLETED** (2025-10-09):
+- [x] Created MetricsPort interface in domain layer (zero infrastructure deps)
+- [x] Implemented PrometheusMetricsAdapter in infrastructure layer
+- [x] Created RED metrics middleware (Rate, Errors, Duration)
+- [x] Implemented /api/v1/metrics endpoint
+- [x] Added 19 comprehensive tests (8 domain + 11 adapter)
+- [x] Integrated with main application via dependency injection
+- [x] Validated Clean Architecture compliance
+- [x] Created PR documentation
+- [x] All 131 tests passing (112 existing + 19 new)
+
+**trading-system-engine-py** - ✅ **COMPLETED** (2025-10-09):
+- [x] Created MetricsPort interface in domain layer (zero infrastructure deps)
+- [x] Implemented PrometheusMetricsAdapter in infrastructure layer
+- [x] Created RED metrics middleware (Rate, Errors, Duration)
+- [x] Implemented /api/v1/metrics endpoint
+- [x] Added 19 comprehensive tests (8 domain + 11 adapter)
+- [x] Integrated with main application via dependency injection
+- [x] Validated Clean Architecture compliance
+- [x] Created PR documentation
+- [x] All 138 tests passing (119 existing + 19 new)
+
+**test-coordinator-py** - ✅ **COMPLETED** (2025-10-10):
+- [x] Created MetricsPort interface in domain layer (zero infrastructure deps)
+- [x] Implemented PrometheusMetricsAdapter in infrastructure layer
+- [x] Created RED metrics middleware (Rate, Errors, Duration)
+- [x] Implemented /metrics endpoint
+- [x] Added 19 comprehensive tests (8 domain + 11 adapter)
+- [x] Integrated with main application via dependency injection
+- [x] Validated Clean Architecture compliance
+- [x] Created PR documentation
+- [x] All 180 tests passing (161 existing + 19 new)
+
+**Architecture Pattern**:
+- **Domain Layer**: MetricsPort protocol (what metrics are needed)
+- **Infrastructure Layer**: PrometheusMetricsAdapter (how to collect with Prometheus)
+- **Presentation Layer**: RED middleware + /metrics endpoint (uses port abstraction)
+- **Future Migration**: Swap PrometheusAdapter for OpenTelemetryAdapter without changing other layers
+
+**RED Pattern Metrics**:
+- **Rate**: `http_requests_total` counter
+- **Errors**: `http_request_errors_total` counter (4xx/5xx)
+- **Duration**: `http_request_duration_seconds` histogram
+
+**Labels (Low Cardinality)**:
+- Constant: service, instance, version
+- Per-request: method, route, code
+
+**BDD Acceptance**: ✅ **COMPLETED** - All three Python services (risk-monitor-py, trading-system-engine-py, test-coordinator-py) expose /metrics endpoints with RED pattern metrics using Clean Architecture. Future OpenTelemetry migration requires only adapter changes.
+
+**Dependencies**: TSE-0001.12.0 (Multi-Instance Infrastructure Foundation)
+
+**Pattern Consistency**: Follows audit-correlator-go metrics pattern (port/adapter architecture)
 
 ---
 

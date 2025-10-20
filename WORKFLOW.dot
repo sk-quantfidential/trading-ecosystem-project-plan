@@ -1,0 +1,367 @@
+digraph TradingEcosystemWorkflow {
+    rankdir=TB;
+    node [shape=box, style=rounded, fontname="Arial"];
+    edge [fontname="Arial"];
+
+    // Define colors for different types of nodes
+    node [fillcolor=lightblue, style="rounded,filled"];
+
+    // ============================================
+    // SESSION START
+    // ============================================
+    start [label="Start Session", shape=ellipse, fillcolor=lightgreen];
+
+    // ============================================
+    // CONFIGURATION LOADING
+    // ============================================
+    subgraph cluster_config {
+        label="Load Configuration";
+        style=dashed;
+        fillcolor=lightyellow;
+
+        load_global [label="Load Global Skills\n~/.claude/skills"];
+        load_local [label="Load Local Config\n./project-plan/.claude/"];
+        load_master_todo [label="Load TODO-MASTER.md\nAssess Project State"];
+
+        load_global -> load_local;
+        load_local -> load_master_todo;
+    }
+
+    start -> load_global;
+
+    // ============================================
+    // PROJECT STATE ASSESSMENT
+    // ============================================
+    assess_state [label="Assess Epic State", shape=diamond, fillcolor=lightyellow];
+    load_master_todo -> assess_state;
+
+    // Three paths from state assessment
+    mid_epic [label="Mid-Epic\nContinue WIP"];
+    ready_epic [label="Ready for\nExisting Epic"];
+    new_epic [label="Brainstorm\nNew Epic"];
+
+    assess_state -> mid_epic [label="In Progress"];
+    assess_state -> ready_epic [label="Epic Ready"];
+    assess_state -> new_epic [label="Need New Features"];
+
+    // ============================================
+    // EPIC BRAINSTORMING (if new)
+    // ============================================
+    subgraph cluster_brainstorm {
+        label="Epic Planning (New)";
+        style=dashed;
+        fillcolor=lightcyan;
+
+        define_features [label="Define Features\n& User Stories"];
+        breakdown_tasks [label="Break Down\ninto Tasks"];
+        identify_repos [label="Identify Affected\nRepositories"];
+        update_master_todo [label="Update\nTODO-MASTER.md"];
+
+        define_features -> breakdown_tasks;
+        breakdown_tasks -> identify_repos;
+        identify_repos -> update_master_todo;
+    }
+
+    new_epic -> define_features;
+
+    // ============================================
+    // SESSION OUTCOME DEFINITION
+    // ============================================
+    define_session_outcome [label="Define Today's\nSession Outcome", fillcolor=lightcoral];
+
+    mid_epic -> define_session_outcome;
+    ready_epic -> define_session_outcome;
+    update_master_todo -> define_session_outcome;
+
+    // ============================================
+    // MULTI-REPO PLANNING
+    // ============================================
+    subgraph cluster_repo_planning {
+        label="Multi-Repo Planning";
+        style=dashed;
+        fillcolor=lavender;
+
+        identify_components [label="Identify Required\nComponent Repos"];
+        analyze_dependencies [label="Analyze\nCross-Dependencies"];
+        new_service_needed [label="New Service\nNeeded?", shape=diamond];
+        plan_service [label="Plan New Service\nArchitecture"];
+
+        identify_components -> analyze_dependencies;
+        analyze_dependencies -> new_service_needed;
+        new_service_needed -> plan_service [label="Yes"];
+    }
+
+    define_session_outcome -> identify_components;
+
+    // ============================================
+    // BRANCH MANAGEMENT
+    // ============================================
+    subgraph cluster_git {
+        label="Git Branch Management";
+        style=dashed;
+        fillcolor=lightgreen;
+
+        check_branches [label="Check Branch\nState for All Repos"];
+        branch_exists [label="Correct Branch\nExists?", shape=diamond];
+        create_branch [label="Create Feature\nBranch(es)"];
+        checkout_branch [label="Checkout\nBranches"];
+
+        check_branches -> branch_exists;
+        branch_exists -> create_branch [label="No"];
+        branch_exists -> checkout_branch [label="Yes"];
+        create_branch -> checkout_branch;
+    }
+
+    new_service_needed -> check_branches [label="No"];
+    plan_service -> check_branches;
+
+    // ============================================
+    // TODO.md UPDATES
+    // ============================================
+    subgraph cluster_todo_updates {
+        label="Task Planning per Repo";
+        style=dashed;
+        fillcolor=lightblue;
+
+        update_repo_todos [label="Update TODO.md\nfor Each Repo"];
+        detail_tasks [label="Add Detailed Tasks\n& Acceptance Criteria"];
+        mark_dependencies [label="Mark Cross-Repo\nDependencies"];
+
+        update_repo_todos -> detail_tasks;
+        detail_tasks -> mark_dependencies;
+    }
+
+    checkout_branch -> update_repo_todos;
+
+    // ============================================
+    // INTERFACE DESIGN DECISION
+    // ============================================
+    interface_changes [label="Interface Changes\nNeeded?", shape=diamond, fillcolor=yellow];
+    mark_dependencies -> interface_changes;
+
+    // ============================================
+    // PUBLIC INTERFACE DESIGN
+    // ============================================
+    subgraph cluster_interface {
+        label="Public Interface Design";
+        style=dashed;
+        fillcolor=mistyrose;
+
+        schema_updates [label="Update Schemas"];
+        protobuf_update [label="Update Protobuf\nDefinitions\n(protobuf-schemas)"];
+        grpc_update [label="Update gRPC\nService Defs"];
+        http_api_update [label="Update HTTP API\nEndpoints"];
+        json_format_update [label="Update JSON\nMessage Formats"];
+
+        schema_updates -> protobuf_update;
+        schema_updates -> grpc_update;
+        schema_updates -> http_api_update;
+        schema_updates -> json_format_update;
+
+        generate_code [label="Generate Code\nfrom Schemas"];
+        protobuf_update -> generate_code;
+        grpc_update -> generate_code;
+    }
+
+    interface_changes -> schema_updates [label="Yes"];
+
+    // ============================================
+    // DEPLOYMENT SETUP (for new service)
+    // ============================================
+    subgraph cluster_deployment {
+        label="New Service Deployment";
+        style=dashed;
+        fillcolor=lightgoldenrodyellow;
+
+        invoke_deploy_skill [label="Invoke Deployment\nSkill"];
+        setup_minimal [label="Setup Minimal\nService Structure"];
+        config_docker [label="Configure Docker\n& Compose"];
+        config_ports [label="Configure Ports\n& Service Registry"];
+        test_deploy [label="Test Deployment\nin Ecosystem"];
+
+        invoke_deploy_skill -> setup_minimal;
+        setup_minimal -> config_docker;
+        config_docker -> config_ports;
+        config_ports -> test_deploy;
+    }
+
+    plan_service -> invoke_deploy_skill;
+
+    // ============================================
+    // IMPLEMENTATION PHASE
+    // ============================================
+    ready_to_implement [label="Ready to\nImplement", fillcolor=lightcoral];
+
+    interface_changes -> ready_to_implement [label="No"];
+    generate_code -> ready_to_implement;
+    test_deploy -> ready_to_implement;
+
+    subgraph cluster_implementation {
+        label="Implementation";
+        style=dashed;
+        fillcolor=lightsteelblue;
+
+        invoke_lang_skills [label="Invoke Language Skills\n(Go/Python/TypeScript)"];
+        invoke_db_skills [label="Invoke Database Skills\n(if needed)"];
+        implement_tests [label="Write Tests First\n(TDD Protocol)"];
+        implement_code [label="Implement\nFunctionality"];
+        run_tests [label="Run Test Suite"];
+
+        invoke_lang_skills -> implement_tests;
+        invoke_db_skills -> implement_tests;
+        implement_tests -> implement_code;
+        implement_code -> run_tests;
+    }
+
+    ready_to_implement -> invoke_lang_skills;
+    ready_to_implement -> invoke_db_skills;
+
+    // ============================================
+    // TESTING & QUALITY
+    // ============================================
+    tests_pass [label="All Tests\nPass?", shape=diamond, fillcolor=yellow];
+    run_tests -> tests_pass;
+
+    fix_issues [label="Fix Issues"];
+    tests_pass -> fix_issues [label="No"];
+    fix_issues -> run_tests;
+
+    // ============================================
+    // REFACTORING
+    // ============================================
+    subgraph cluster_refactor {
+        label="Refactoring Phase";
+        style=dashed;
+        fillcolor=wheat;
+
+        needs_refactor [label="Refactoring\nNeeded?", shape=diamond];
+        refactor_code [label="Refactor for:\n- Clarity\n- Performance\n- Maintainability"];
+        verify_tests [label="Verify Tests\nStill Pass"];
+
+        needs_refactor -> refactor_code [label="Yes"];
+        refactor_code -> verify_tests;
+    }
+
+    tests_pass -> needs_refactor [label="Yes"];
+
+    // ============================================
+    // SECURITY & CROSS-CUTTING CONCERNS
+    // ============================================
+    subgraph cluster_security {
+        label="Security & Cross-Cutting";
+        style=dashed;
+        fillcolor=lightpink;
+
+        invoke_security [label="Invoke Security\nSkills"];
+        check_github_actions [label="Check GitHub Actions:\n- Linting\n- Security Scanning\n- Dependency Audit"];
+        check_logging [label="Verify Logging\n& Observability"];
+        check_metrics [label="Verify Metrics\n& Health Checks"];
+        check_error_handling [label="Verify Error\nHandling"];
+
+        invoke_security -> check_github_actions;
+        check_github_actions -> check_logging;
+        check_logging -> check_metrics;
+        check_metrics -> check_error_handling;
+    }
+
+    needs_refactor -> invoke_security [label="No"];
+    verify_tests -> invoke_security;
+
+    // ============================================
+    // DOCUMENTATION
+    // ============================================
+    subgraph cluster_docs {
+        label="Documentation";
+        style=dashed;
+        fillcolor=lightcyan;
+
+        update_repo_readme [label="Update Each Repo\nREADME.md"];
+        update_api_docs [label="Update API\nDocumentation"];
+        update_architecture [label="Update Architecture\nDiagrams (if needed)"];
+        create_pr_docs [label="Create PR Files\nin ./docs/prs"];
+
+        update_repo_readme -> update_api_docs;
+        update_api_docs -> update_architecture;
+        update_architecture -> create_pr_docs;
+    }
+
+    check_error_handling -> update_repo_readme;
+
+    // ============================================
+    // FINAL VERIFICATION
+    // ============================================
+    subgraph cluster_final {
+        label="Final Verification";
+        style=dashed;
+        fillcolor=lightgreen;
+
+        integration_test [label="Run Integration\nTests"];
+        verify_ecosystem [label="Verify Full\nEcosystem"];
+        ready_for_pr [label="Ready for\nPull Request?", shape=diamond];
+
+        integration_test -> verify_ecosystem;
+        verify_ecosystem -> ready_for_pr;
+    }
+
+    create_pr_docs -> integration_test;
+
+    // ============================================
+    // PR CREATION
+    // ============================================
+    subgraph cluster_pr {
+        label="Pull Request Creation";
+        style=dashed;
+        fillcolor=palegreen;
+
+        create_commits [label="Create Commits\nwith Conventional\nCommit Messages"];
+        push_branches [label="Push Branches\nto Remote"];
+        create_prs [label="Create PRs\nfor Each Repo"];
+        link_prs [label="Link Related PRs\nin Descriptions"];
+
+        create_commits -> push_branches;
+        push_branches -> create_prs;
+        create_prs -> link_prs;
+    }
+
+    ready_for_pr -> create_commits [label="Yes"];
+
+    address_issues [label="Address\nRemaining Issues"];
+    ready_for_pr -> address_issues [label="No"];
+    address_issues -> integration_test;
+
+    // ============================================
+    // SESSION END
+    // ============================================
+    update_todo_master_final [label="Update TODO-MASTER.md\nMark Progress"];
+    session_summary [label="Generate Session\nSummary"];
+    end [label="End Session", shape=ellipse, fillcolor=lightcoral];
+
+    link_prs -> update_todo_master_final;
+    update_todo_master_final -> session_summary;
+    session_summary -> end;
+
+    // ============================================
+    // PARALLEL WORK COORDINATION
+    // ============================================
+    subgraph cluster_parallel {
+        label="Parallel Work Notes";
+        style=dotted;
+        fillcolor=white;
+
+        parallel_note [label="Multiple repos can be\nworked on in parallel\nif dependencies allow", shape=note, fillcolor=lightyellow];
+    }
+
+    // ============================================
+    // LEGEND
+    // ============================================
+    subgraph cluster_legend {
+        label="Legend";
+        style=solid;
+        fillcolor=white;
+
+        legend_decision [label="Decision Point", shape=diamond, fillcolor=yellow];
+        legend_process [label="Process", shape=box, style=rounded, fillcolor=lightblue];
+        legend_start_end [label="Start/End", shape=ellipse, fillcolor=lightgreen];
+        legend_critical [label="Critical Path", shape=box, style=rounded, fillcolor=lightcoral];
+    }
+}

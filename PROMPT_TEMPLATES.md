@@ -1,7 +1,7 @@
 # Claude Code Prompt Templates
 
 ## Service Implementation Template
-"Implement gRPC service for [SERVICE_NAME] according to specification in 
+"Implement gRPC service for [SERVICE_NAME] according to specification in
 COMPONENT_SPECIFICATIONS.md. Include:
 - Health check endpoints
 - OpenTelemetry tracing  
@@ -12,6 +12,4 @@ Follow patterns established in existing services."
 
 ## Chaos API Template
 "Add chaos injection REST API to [SERVICE_NAME] for:
-- [FAILURE_MODE_1]: [DESCRIPTION]
-- [FAILURE_MODE_2]: [DESCRIPTION]
 Include OpenAPI documentation and integration tests."

@@ -64,7 +64,7 @@ audit_coverage{risk_scenario="portfolio_concentration", tested="true", validated
 #### **Exchange Simulator** (Go)
 **Represents**: Real crypto exchanges (Binance, Coinbase Pro, etc.)
 **Core Function**: Order matching engine with realistic latency, slippage, and liquidity constraints
-**Key Behaviors**: 
+**Key Behaviors**:
 - Maintains order books for BTC/USD, USDT/BTC, USDT/ETH, ETH/USD, BTC/ETH
 - Processes market/limit orders with realistic fills
 - Manages sub-accounts and balances for trading entities
@@ -150,7 +150,7 @@ audit_coverage{risk_scenario="portfolio_concentration", tested="true", validated
 
 ## Key Interaction Flows
 
-### **Scenario Execution & Validation Flow**:
+### **Scenario Execution & Validation Flow**
 1. **Test Coordinator** → Injects chaos scenario (e.g., stablecoin depeg)
 2. **Audit Layer** → Records exact timing and parameters of injection  
 3. **Market Data Simulator** → Gradually adjusts USDT/USD price (production-visible)
@@ -158,7 +158,7 @@ audit_coverage{risk_scenario="portfolio_concentration", tested="true", validated
 5. **Audit Correlator** → Validates alert timing against injection timeline
 6. **Grafana Dashboard** → Shows causation chain and validates detection SLA
 
-### **Signal Flow Architecture**:
+### **Signal Flow Architecture**
 ```
 ┌─────────────────┐     ┌──────────────────┐    ┌─────────────────┐
 │   Risk Monitor  │───▶│ Prometheus/OTEL  │◀───│ Audit Correlator│
@@ -173,7 +173,7 @@ audit_coverage{risk_scenario="portfolio_concentration", tested="true", validated
 └──────────────────┘                            └─────────────────┘
 ```
 
-### **Dual Dashboard Experience**:
+### **Dual Dashboard Experience**
 ```
 Production Risk View:          Audit/Validation View:
 ┌──────────────────────┐       ┌──────────────────────┐
@@ -186,7 +186,7 @@ Production Risk View:          Audit/Validation View:
 
 ## Enhanced Grafana Dashboard Strategy
 
-### **Dashboard Separation**:
+### **Dashboard Separation**
 
 **A. Production Risk Dashboard** (Risk Monitor View)
 - What a real risk manager sees in production
@@ -209,7 +209,7 @@ Production Risk View:          Audit/Validation View:
 
 ## Container Architecture
 
-### **Clean Separation in Docker Compose**:
+### **Clean Separation in Docker Compose**
 ```yaml
 services:
   # Pure production risk monitoring
@@ -251,24 +251,24 @@ services:
 
 ## Failure Scenarios to Model
 
-### **1. Strategy Malfunction**: 
+### **1. Strategy Malfunction**
 - **RunawayStrategy** sends massive orders, overwhelming exchange liquidity
 - **RiskIgnorantStrategy** continues trading despite risk breaches
 - **VolatilityAmplifierStrategy** amplifies market volatility through momentum chasing
 
-### **2. Price Divergence**: 
+### **2. Price Divergence**
 - **Market Data Simulator** creates controlled spot vs futures price divergence
 - **CorrelationBreakerStrategy** trades against normal asset correlations
 
-### **3. Market Crash**: 
+### **3. Market Crash**
 - **Market Data Simulator** orchestrates coordinated 15% price drop across all assets
 - **Trading strategies** respond to volatility with increased position taking
 
-### **4. Stablecoin Depeg**: 
+### **4. Stablecoin Depeg**
 - **Market Data Simulator** slowly depegs USDT from USD over 36-hour period
 - **Risk Monitor** must detect and alert on increasing stablecoin exposure risk
 
-### **5. Settlement Failure**: 
+### **5. Settlement Failure**
 - **Custodian Simulator** fails to process exchange P&L settlements
 - **Risk Monitor** must detect and alert on unsettled exposure accumulation
 

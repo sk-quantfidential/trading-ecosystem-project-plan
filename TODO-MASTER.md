@@ -11,12 +11,12 @@
 ### Progress Summary
 - **Infrastructure Foundation Phase**: ✅ **COMPLETED** - All 7 milestones done (TSE-0001.1a ✅, TSE-0001.1b ✅, TSE-0001.1c ✅, TSE-0001.2 ✅, TSE-0001.3a ✅, TSE-0001.3b ✅, TSE-0001.3c ✅)
 - **Data Architecture & Deployment Phase**: ✅ **COMPLETED** - TSE-0001.4 at 100% (8 of 8 services complete: audit ✅, custodian ✅, exchange ✅, market-data ✅, risk-monitor ✅, trading-system-engine ✅, test-coordinator ✅, orchestrator ✅)
-- **Multi-Instance Infrastructure**: ✅ **COMPLETED** - TSE-0001.12.0 at 100% (Named components foundation: 5 repos modified, all Python services standardized)
+- **Multi-Instance Infrastructure**: ✅ **COMPLETED** - TSE-0001.12.0 at 100% (Instance-based container naming: 11 repos modified, Docker naming convention updated, validation added to all services)
 - **Core Services Phase**: 0 of 10 milestones completed
 - **Observability & Integration Phase**: 0 of 8 milestones completed
 
 **Current Milestone**: TSE-0001.5 (Market Data Foundation) - Ready to start
-**Completed**: TSE-0001.4 (audit) ✅, TSE-0001.4.1 (custodian) ✅, TSE-0001.4.2 (exchange) ✅, TSE-0001.4.3 (market-data) ✅, TSE-0001.4.4 (risk-monitor) ✅, TSE-0001.4.5 (trading-system-engine) ✅, TSE-0001.4.6 (test-coordinator) ✅, TSE-0001.12.0 (named components) ✅
+**Completed**: TSE-0001.4 (audit) ✅, TSE-0001.4.1 (custodian) ✅, TSE-0001.4.2 (exchange) ✅, TSE-0001.4.3 (market-data) ✅, TSE-0001.4.4 (risk-monitor) ✅, TSE-0001.4.5 (trading-system-engine) ✅, TSE-0001.4.6 (test-coordinator) ✅, TSE-0001.12.0 (instance naming) ✅
 
 ---
 
@@ -376,9 +376,9 @@
 ---
 
 #### Milestone TSE-0001.12.0: Multi-Instance Infrastructure Foundation
-**Status**: ✅ **COMPLETED** (2025-10-09) - All phases complete across all Python services
-**Components**: All data adapters and services (risk-monitor-py, trading-system-engine-py, test-coordinator-py)
-**Goal**: Enable multi-instance deployment with named components and standardized ports for all Python services
+**Status**: ✅ **COMPLETED** (2025-10-24) - Instance-based Docker naming and validation complete
+**Components**: All services (11 repos: 8 Go, 3 Python) + orchestrator-docker
+**Goal**: Enable multi-instance deployment with DNS-safe instance names, Docker naming convention, and validation
 
 **Completed Phases**:
 
@@ -525,7 +525,45 @@
   - Python test-coordinator-py: 180/180 tests passing (161 existing + 19 startup)
   - Python test-coordinator-data-adapter-py: 14/15 derivation tests passing
 
-**BDD Acceptance**: ✅ Services support multi-instance deployment with separate PostgreSQL schemas and Redis namespaces, enabling instance-aware Grafana monitoring. Validated in both Go (audit-correlator-go) and Python (risk-monitor-py) services.
+**Phase 9 (NEW - 2025-10-24)**: Instance-Based Docker Naming
+- [x] **Go Services Validation** (8 repos):
+  - [x] Added ValidateInstanceName() to all config files
+  - [x] DNS-safe validation: lowercase alphanumeric + hyphens, max 63 chars
+  - [x] Pattern: `^[a-z0-9]([a-z0-9-]*[a-z0-9])?$`
+  - [x] Validated in simulators and data adapters
+
+- [x] **Python Services Validation** (3 repos):
+  - [x] Added model_validator to Settings classes
+  - [x] Validation runs after model_post_init (after defaults applied)
+  - [x] Same DNS-safe rules as Go services
+  - [x] All tests passing with validation
+
+- [x] **Docker Compose Updates**:
+  - [x] Project name: `trading-ecosystem-orchestrator-docker`
+  - [x] Infrastructure containers: Added `-infra` suffix (9 services)
+  - [x] Business containers: Instance-based naming (6 services)
+  - [x] Container mappings:
+    - `trading-ecosystem-exchange-simulator` → `trading-ecosystem-exchange-okx`
+    - `trading-ecosystem-custodian-simulator` → `trading-ecosystem-custodian-komainu`
+    - `trading-ecosystem-market-data-simulator` → `trading-ecosystem-market-data-coinmetrics`
+    - `trading-ecosystem-trading-system-engine` → `trading-ecosystem-trading-engine-lh`
+    - `trading-ecosystem-risk-monitor` → `trading-ecosystem-risk-monitor-lh`
+  - [x] Updated environment variables (SERVICE_INSTANCE_NAME)
+  - [x] Updated volume paths to match instance names
+
+- [x] **Scripts and Documentation**:
+  - [x] Updated init-volumes.sh with DNS-safe instance names
+  - [x] Updated Grafana README.md with new naming patterns
+  - [x] All Prometheus query examples updated
+
+- [x] **Validation**:
+  - [x] All 16 containers running and healthy
+  - [x] Health endpoints return correct instance names
+  - [x] Docker compose syntax valid
+  - [x] All instance names DNS-safe (verified)
+  - [x] All container names under 63 char limit (longest: 41 chars)
+
+**BDD Acceptance**: ✅ All services deploy with DNS-safe instance names following `${PROJECT_NAME}-${INSTANCE_NAME}` pattern. Infrastructure services use `-infra` suffix. Health endpoints return correct instance information. Docker Desktop shows project as `trading-ecosystem-orchestrator-docker`.
 
 **Dependencies**: TSE-0001.4 (Data Adapters & Orchestrator Refactoring)
 

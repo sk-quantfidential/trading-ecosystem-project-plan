@@ -273,7 +273,7 @@ For each repo:
 - [ ] Ready for code review
 - [ ] No known critical issues
 
----
+_________________________________
 
 ## 🎯 Quick Reference
 
@@ -326,7 +326,7 @@ docker-compose logs -f <service>
 - Skills: `~/.claude/skills/`
 - Local Config: `./project-plan/.claude/`
 
----
+_________________________________
 
 **Print this checklist** and keep it handy during development sessions!
 

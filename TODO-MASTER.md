@@ -443,7 +443,7 @@
 **Python Services Implementation** (risk-monitor-py):
 - [x] **Phase 0**: risk-data-adapter-py configuration foundation
   - [x] Added service_name, service_instance_name, environment fields to AdapterConfig
-  - [x] Implemented _derive_schema_name() and _derive_redis_namespace() methods
+  - [x] Implemented `_derive_schema_name()` and `_derive_redis_namespace()` methods
   - [x] Added model_post_init hook for automatic derivation
   - [x] Created 17 comprehensive multi-instance derivation tests (all passing)
   - [x] Singleton: risk-monitor → schema='risk', namespace='risk'
@@ -463,8 +463,8 @@
   - [x] Maintains /api/v1/health as primary path
 
 - [x] **Phase 3**: Structured logging with instance context
-  - [x] Logger binding in DualProtocolServer.__init__()
-  - [x] All logs include: service_name, instance_name, environment
+  - [x] Logger binding in `DualProtocolServer.__init__()`
+  - [x] All logs include: `service_name`, `instance_name`, `environment`
   - [x] Improves observability for multi-instance deployments
 
 - [x] **Phase 4**: Data adapter integration

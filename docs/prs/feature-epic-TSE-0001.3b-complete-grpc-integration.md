@@ -243,10 +243,10 @@ All 7 foundation milestones delivered:
 ### **Health Check Endpoints**
 ```bash
 # gRPC health checks
-grpc_health_probe -addr=localhost:9090 -service=market-data
-grpc_health_probe -addr=localhost:9091 -service=exchange
-grpc_health_probe -addr=localhost:9092 -service=custodian
-grpc_health_probe -addr=localhost:9093 -service=audit
+grpc_health_probe -addr=localhost:50055 -service=market-data
+grpc_health_probe -addr=localhost:50054 -service=exchange
+grpc_health_probe -addr=localhost:50053 -service=custodian
+grpc_health_probe -addr=localhost:50052 -service=audit
 ```
 
 ## 📖 Related Documentation

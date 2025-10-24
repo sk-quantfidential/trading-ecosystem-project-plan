@@ -11,11 +11,12 @@
 ### Progress Summary
 - **Infrastructure Foundation Phase**: ✅ **COMPLETED** - All 7 milestones done (TSE-0001.1a ✅, TSE-0001.1b ✅, TSE-0001.1c ✅, TSE-0001.2 ✅, TSE-0001.3a ✅, TSE-0001.3b ✅, TSE-0001.3c ✅)
 - **Data Architecture & Deployment Phase**: ✅ **COMPLETED** - TSE-0001.4 at 100% (8 of 8 services complete: audit ✅, custodian ✅, exchange ✅, market-data ✅, risk-monitor ✅, trading-system-engine ✅, test-coordinator ✅, orchestrator ✅)
+- **Multi-Instance Infrastructure**: ✅ **COMPLETED** - TSE-0001.12.0 at 100% (Instance-based container naming: 11 repos modified, Docker naming convention updated, validation added to all services)
 - **Core Services Phase**: 0 of 10 milestones completed
 - **Observability & Integration Phase**: 0 of 8 milestones completed
 
 **Current Milestone**: TSE-0001.5 (Market Data Foundation) - Ready to start
-**Completed**: TSE-0001.4 (audit) ✅, TSE-0001.4.1 (custodian) ✅, TSE-0001.4.2 (exchange) ✅, TSE-0001.4.3 (market-data) ✅, TSE-0001.4.4 (risk-monitor) ✅, TSE-0001.4.5 (trading-system-engine) ✅, TSE-0001.4.6 (test-coordinator) ✅
+**Completed**: TSE-0001.4 (audit) ✅, TSE-0001.4.1 (custodian) ✅, TSE-0001.4.2 (exchange) ✅, TSE-0001.4.3 (market-data) ✅, TSE-0001.4.4 (risk-monitor) ✅, TSE-0001.4.5 (trading-system-engine) ✅, TSE-0001.4.6 (test-coordinator) ✅, TSE-0001.12.0 (instance naming) ✅
 
 ---
 
@@ -200,6 +201,7 @@
 - ✅ **Production Ready**: Service builds and runs successfully with advanced market data simulation
 - ✅ **Market Data Simulation**: Statistical similarity, scenario simulation (rally/crash/divergence/reverting), quality metrics
 - ✅ **Advanced Features**: Real-time streaming, correlation coefficient validation, comprehensive scenario testing
+- ✅ **Prometheus Metrics Client** (2025-10-09): Clean Architecture metrics with RED pattern (Rate, Errors, Duration), 8 BDD test scenarios passing, low-cardinality labels, /metrics endpoint exposed, ready for TSE-0001.12a integration
 
 ---
 
@@ -370,6 +372,263 @@
 **BDD Acceptance**: All services access databases only through public data-adapter interfaces, and the entire ecosystem can be built and deployed with single commands
 
 **Dependencies**: TSE-0001.3b (Go Services gRPC Integration), TSE-0001.3c (Python Services gRPC Integration)
+
+---
+
+#### Milestone TSE-0001.12.0: Multi-Instance Infrastructure Foundation
+**Status**: ✅ **COMPLETED** (2025-10-24) - Instance-based Docker naming and validation complete
+**Components**: All services (11 repos: 8 Go, 3 Python) + orchestrator-docker
+**Goal**: Enable multi-instance deployment with DNS-safe instance names, Docker naming convention, and validation
+
+**Completed Phases**:
+
+**Go Services Implementation** (audit-correlator-go):
+- [x] **Phase 0 (CRITICAL)**: audit-data-adapter-go configuration foundation
+  - [x] Added ServiceName, ServiceInstanceName, SchemaName, RedisNamespace fields to RepositoryConfig
+  - [x] Implemented deriveSchemaName() and deriveRedisNamespace() functions
+  - [x] Added LogConfiguration() with password masking
+  - [x] Created 6 unit test suites (all passing)
+  - [x] Backward compatibility: SERVICE_INSTANCE_NAME defaults to SERVICE_NAME
+
+- [x] **Phase 1**: audit-correlator-go configuration layer
+  - [x] Added ServiceInstanceName to Config struct
+  - [x] Updated Load() to read SERVICE_INSTANCE_NAME environment variable
+  - [x] Added structured logging with instance context
+  - [x] Build verification successful
+
+- [x] **Phase 2**: Service discovery integration
+  - [x] Updated service registration ID to use ServiceInstanceName
+  - [x] Enhanced metadata with service_type and instance_name fields
+  - [x] Redis keys pattern: services:{service-name}:{instance-id}
+  - [x] Build verification successful
+
+- [x] **Phase 3**: PostgreSQL schema support
+  - [x] Updated all SQL queries (12 functions) for dynamic schema prefix
+  - [x] Added ValidateSchema() for schema existence validation
+  - [x] Multi-tenancy via schema isolation
+  - [x] Build verification successful
+
+- [x] **Phase 4**: Redis namespace support
+  - [x] Updated getCacheKey() for dynamic namespace prefix
+  - [x] Added ValidateNamespace() for namespace write validation
+  - [x] Updated GetKeysByPattern() for namespace-aware operations
+  - [x] Service discovery keys remain global (cross-instance visibility)
+
+- [x] **Phase 5**: Docker deployment configuration
+  - [x] Added SERVICE_INSTANCE_NAME to audit-correlator service
+  - [x] Added volume mappings (data/logs)
+  - [x] Created init-volumes.sh for automated volume initialization
+  - [x] Pre-configured for singleton and multi-instance services
+
+- [x] **Phase 6**: PostgreSQL schema initialization
+  - [x] Created "audit" schema for singleton instance
+  - [x] Maintained "audit_correlator" for backward compatibility
+  - [x] Added automated migration from public to audit schema
+  - [x] Full table structure in both schemas
+  - [x] Permissions for audit_adapter and monitor_user
+
+- [x] **Phase 7**: Health check enhancement
+  - [x] Added Config field to HealthHandler
+  - [x] Created NewHealthHandlerWithConfig() constructor
+  - [x] Health endpoint includes instance information
+  - [x] Response: service, instance, version, environment, timestamp
+
+- [x] **Phase 8**: Grafana dashboards
+  - [x] Created grafana/dashboards directory
+  - [x] Comprehensive README for dashboard setup
+  - [x] Documented Docker Infrastructure and Simulation Entity views
+  - [x] Prometheus scrape configuration examples
+  - [x] PromQL queries for instance-aware monitoring
+
+**Python Services Implementation** (risk-monitor-py):
+- [x] **Phase 0**: risk-data-adapter-py configuration foundation
+  - [x] Added service_name, service_instance_name, environment fields to AdapterConfig
+  - [x] Implemented `_derive_schema_name()` and `_derive_redis_namespace()` methods
+  - [x] Added model_post_init hook for automatic derivation
+  - [x] Created 17 comprehensive multi-instance derivation tests (all passing)
+  - [x] Singleton: risk-monitor → schema='risk', namespace='risk'
+  - [x] Multi-instance: risk-monitor-LH → schema='risk_monitor_lh', namespace='risk_monitor:LH'
+
+- [x] **Phase 1**: risk-monitor-py configuration layer
+  - [x] Added service_instance_name field to Settings
+  - [x] Added environment field with Literal validation (development, testing, production, docker)
+  - [x] Added field_validator for case-insensitive log_level normalization
+  - [x] Updated model_post_init for automatic instance name derivation
+  - [x] All builds successful
+
+- [x] **Phase 2**: Health endpoint enhancement
+  - [x] Updated HealthResponse model with instance metadata
+  - [x] Returns: service, instance, version, environment, timestamp (ISO 8601 UTC)
+  - [x] Added convenience root-level /health endpoint
+  - [x] Maintains /api/v1/health as primary path
+
+- [x] **Phase 3**: Structured logging with instance context
+  - [x] Logger binding in `DualProtocolServer.__init__()`
+  - [x] All logs include: `service_name`, `instance_name`, `environment`
+  - [x] Improves observability for multi-instance deployments
+
+- [x] **Phase 4**: Data adapter integration
+  - [x] Updated setup_data_adapter() to pass service identity
+  - [x] Fixed to use settings.postgres_url instead of database_url
+  - [x] Adapter automatically derives schema and namespace
+  - [x] Graceful degradation when adapter unavailable
+
+- [x] **Phase 5**: Docker build and dependencies
+  - [x] Fixed COPY paths for parent directory context
+  - [x] Added opentelemetry-exporter-otlp-proto-grpc dependency
+  - [x] Added grpcio-reflection dependency
+  - [x] Simplified PYTHONPATH by copying src directly to /app
+
+- [x] **Phase 6**: Docker deployment configuration
+  - [x] Added SERVICE_INSTANCE_NAME=risk-monitor to docker-compose.yml
+  - [x] Updated healthcheck to use /api/v1/health endpoint
+  - [x] Added environment variables for service identity
+  - [x] Service deployed on 172.20.0.94 with proper network config
+
+- [x] **Phase 7**: Comprehensive testing
+  - [x] Created 15 startup tests in tests/unit/test_startup.py
+  - [x] Validates instance-aware initialization
+  - [x] Validates logger binding with instance context
+  - [x] Validates data adapter configuration
+  - [x] All tests passing (52/52 total including existing tests)
+
+- [x] **Phase 8**: Clean Architecture validation
+  - [x] Verified 100% Clean Architecture compliance
+  - [x] Domain layer: No modifications (pure business logic)
+  - [x] Application layer: Logger binding only
+  - [x] Infrastructure layer: Configuration changes isolated
+  - [x] Presentation layer: Health endpoint updates only
+
+**Architectural Patterns**:
+- **Schema Derivation**:
+  - Go Singleton: audit-correlator → "audit" schema
+  - Go Multi-instance: exchange-OKX → "exchange_okx" schema
+  - Python Singleton: risk-monitor → "risk" schema
+  - Python Multi-instance: risk-monitor-LH → "risk_monitor_lh" schema
+- **Redis Namespace**:
+  - Go Singleton: audit-correlator → "audit:*" keys
+  - Go Multi-instance: exchange-OKX → "exchange:OKX:*" keys
+  - Python Singleton: risk-monitor → "risk:*" keys
+  - Python Multi-instance: risk-monitor-LH → "risk_monitor:LH:*" keys
+- **Service Discovery**: services:{service-name}:{instance-id}
+
+**Implementation Summary**:
+- **Repositories Modified**: 9 (audit-data-adapter-go, audit-correlator-go, risk-data-adapter-py, risk-monitor-py, trading-data-adapter-py, trading-system-engine-py, test-coordinator-data-adapter-py, test-coordinator-py, orchestrator-docker, project-plan)
+- **Feature Branches**:
+  - Go: feature/TSE-0001.12.0-named-components-foundation
+  - Python: feature/TSE-0001.12.0-named-components-foundation
+- **Total Commits**: 20+ (11 Go + 9+ Python)
+- **Test Results**:
+  - Go: All builds successful, 6 unit test suites passing
+  - Python risk-monitor-py: 52/52 tests passing (44 existing + 8 integration + 15 startup)
+  - Python trading-system-engine-py: Implementation complete
+  - Python test-coordinator-py: 180/180 tests passing (161 existing + 19 startup)
+  - Python test-coordinator-data-adapter-py: 14/15 derivation tests passing
+
+**Phase 9 (NEW - 2025-10-24)**: Instance-Based Docker Naming
+- [x] **Go Services Validation** (8 repos):
+  - [x] Added ValidateInstanceName() to all config files
+  - [x] DNS-safe validation: lowercase alphanumeric + hyphens, max 63 chars
+  - [x] Pattern: `^[a-z0-9]([a-z0-9-]*[a-z0-9])?$`
+  - [x] Validated in simulators and data adapters
+
+- [x] **Python Services Validation** (3 repos):
+  - [x] Added model_validator to Settings classes
+  - [x] Validation runs after model_post_init (after defaults applied)
+  - [x] Same DNS-safe rules as Go services
+  - [x] All tests passing with validation
+
+- [x] **Docker Compose Updates**:
+  - [x] Project name: `trading-ecosystem-orchestrator-docker`
+  - [x] Infrastructure containers: Added `-infra` suffix (9 services)
+  - [x] Business containers: Instance-based naming (6 services)
+  - [x] Container mappings:
+    - `trading-ecosystem-exchange-simulator` → `trading-ecosystem-exchange-okx`
+    - `trading-ecosystem-custodian-simulator` → `trading-ecosystem-custodian-komainu`
+    - `trading-ecosystem-market-data-simulator` → `trading-ecosystem-market-data-coinmetrics`
+    - `trading-ecosystem-trading-system-engine` → `trading-ecosystem-trading-engine-lh`
+    - `trading-ecosystem-risk-monitor` → `trading-ecosystem-risk-monitor-lh`
+  - [x] Updated environment variables (SERVICE_INSTANCE_NAME)
+  - [x] Updated volume paths to match instance names
+
+- [x] **Scripts and Documentation**:
+  - [x] Updated init-volumes.sh with DNS-safe instance names
+  - [x] Updated Grafana README.md with new naming patterns
+  - [x] All Prometheus query examples updated
+
+- [x] **Validation**:
+  - [x] All 16 containers running and healthy
+  - [x] Health endpoints return correct instance names
+  - [x] Docker compose syntax valid
+  - [x] All instance names DNS-safe (verified)
+  - [x] All container names under 63 char limit (longest: 41 chars)
+
+**BDD Acceptance**: ✅ All services deploy with DNS-safe instance names following `${PROJECT_NAME}-${INSTANCE_NAME}` pattern. Infrastructure services use `-infra` suffix. Health endpoints return correct instance information. Docker Desktop shows project as `trading-ecosystem-orchestrator-docker`.
+
+**Dependencies**: TSE-0001.4 (Data Adapters & Orchestrator Refactoring)
+
+---
+
+#### Milestone TSE-0001.12.0b: Prometheus Metrics (Clean Architecture)
+**Status**: ✅ **COMPLETED** (2025-10-10) - All three Python services complete!
+**Components**: risk-monitor-py ✅, trading-system-engine-py ✅, test-coordinator-py ✅
+**Goal**: Add Prometheus metrics using Clean Architecture (port/adapter pattern) to enable future OpenTelemetry migration
+
+**Completed Services**:
+
+**risk-monitor-py** - ✅ **COMPLETED** (2025-10-09):
+- [x] Created MetricsPort interface in domain layer (zero infrastructure deps)
+- [x] Implemented PrometheusMetricsAdapter in infrastructure layer
+- [x] Created RED metrics middleware (Rate, Errors, Duration)
+- [x] Implemented /api/v1/metrics endpoint
+- [x] Added 19 comprehensive tests (8 domain + 11 adapter)
+- [x] Integrated with main application via dependency injection
+- [x] Validated Clean Architecture compliance
+- [x] Created PR documentation
+- [x] All 131 tests passing (112 existing + 19 new)
+
+**trading-system-engine-py** - ✅ **COMPLETED** (2025-10-09):
+- [x] Created MetricsPort interface in domain layer (zero infrastructure deps)
+- [x] Implemented PrometheusMetricsAdapter in infrastructure layer
+- [x] Created RED metrics middleware (Rate, Errors, Duration)
+- [x] Implemented /api/v1/metrics endpoint
+- [x] Added 19 comprehensive tests (8 domain + 11 adapter)
+- [x] Integrated with main application via dependency injection
+- [x] Validated Clean Architecture compliance
+- [x] Created PR documentation
+- [x] All 138 tests passing (119 existing + 19 new)
+
+**test-coordinator-py** - ✅ **COMPLETED** (2025-10-10):
+- [x] Created MetricsPort interface in domain layer (zero infrastructure deps)
+- [x] Implemented PrometheusMetricsAdapter in infrastructure layer
+- [x] Created RED metrics middleware (Rate, Errors, Duration)
+- [x] Implemented /metrics endpoint
+- [x] Added 19 comprehensive tests (8 domain + 11 adapter)
+- [x] Integrated with main application via dependency injection
+- [x] Validated Clean Architecture compliance
+- [x] Created PR documentation
+- [x] All 180 tests passing (161 existing + 19 new)
+
+**Architecture Pattern**:
+- **Domain Layer**: MetricsPort protocol (what metrics are needed)
+- **Infrastructure Layer**: PrometheusMetricsAdapter (how to collect with Prometheus)
+- **Presentation Layer**: RED middleware + /metrics endpoint (uses port abstraction)
+- **Future Migration**: Swap PrometheusAdapter for OpenTelemetryAdapter without changing other layers
+
+**RED Pattern Metrics**:
+- **Rate**: `http_requests_total` counter
+- **Errors**: `http_request_errors_total` counter (4xx/5xx)
+- **Duration**: `http_request_duration_seconds` histogram
+
+**Labels (Low Cardinality)**:
+- Constant: service, instance, version
+- Per-request: method, route, code
+
+**BDD Acceptance**: ✅ **COMPLETED** - All three Python services (risk-monitor-py, trading-system-engine-py, test-coordinator-py) expose /metrics endpoints with RED pattern metrics using Clean Architecture. Future OpenTelemetry migration requires only adapter changes.
+
+**Dependencies**: TSE-0001.12.0 (Multi-Instance Infrastructure Foundation)
+
+**Pattern Consistency**: Follows audit-correlator-go metrics pattern (port/adapter architecture)
 
 ---
 
@@ -769,3 +1028,53 @@ All 8 services successfully integrated with data adapters following Clean Archit
 ✅ TDD Red-Green-Refactor cycle
 
 **Ready for TSE-0001.5: Core Services Phase**
+**Test Coordinator Implementation** (test-coordinator-py) - NEWLY COMPLETED:
+- [x] **Phase 1**: Configuration foundation
+  - [x] Added service_name, service_instance_name fields to Settings
+  - [x] Added environment: Literal["development", "testing", "production", "docker"]
+  - [x] Added @field_validator for log_level normalization
+  - [x] Changed default ports: 8080/50051 (standardized Python service ports)
+  - [x] Added postgres_url configuration
+  - [x] model_post_init for instance name auto-derivation
+
+- [x] **Phase 2**: Health endpoint with instance metadata
+  - [x] Updated HealthResponse: service, instance, version, environment, timestamp
+  - [x] Returns ISO 8601 UTC timestamps
+  - [x] Uses service identity from settings
+
+- [x] **Phase 3**: Structured logging with instance context
+  - [x] Logger binding in lifespan() startup
+  - [x] All logs include: service_name, instance_name, environment
+  - [x] Improves observability for chaos testing scenarios
+
+- [x] **Phase 4**: Data adapter integration
+  - [x] Pass service identity to AdapterConfig
+  - [x] Adapter derives schema/namespace when supported
+  - [x] Graceful degradation with stub repositories
+
+- [x] **Phase 5**: Docker deployment standardization
+  - [x] Updated Dockerfile: ports 8080/50051
+  - [x] Health check on port 8080
+  - [x] Maintains Docker socket mount for orchestration
+
+- [x] **Phase 6**: Orchestrator integration
+  - [x] Added test-coordinator to docker-compose.yml (172.20.0.87:8087→8080)
+  - [x] Added Prometheus scraping configuration
+  - [x] Environment variables for service identity
+  - [x] Volume mappings for data/logs
+
+- [x] **Phase 7**: Comprehensive testing
+  - [x] Created 19 startup tests for instance awareness
+  - [x] All 174 tests passing (155 existing + 19 new)
+  - [x] Validated instance derivation patterns
+  - [x] Validated logger binding
+  - [x] Validated adapter configuration
+
+**Port Standardization Summary**:
+- **All Python Services**: Internal ports 8080/50051 (HTTP/gRPC)
+- **External Port Mapping**:
+  - risk-monitor: 8085:8080, 50054:50051
+  - trading-system-engine: 8086:8080, 50053:50051
+  - test-coordinator: 8087:8080, 50055:50051
+- **Benefits**: Simplified templates, consistent Docker patterns, easier multi-instance scaling
+

@@ -1,0 +1,115 @@
+digraph WorkflowDocumentationMap {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fontname="Arial"];
+    edge [fontname="Arial"];
+
+    // Entry points
+    subgraph cluster_entry {
+        label="Start Here";
+        style=filled;
+        fillcolor=lightgreen;
+
+        readme [label="README-WORKFLOW.md\n(You Are Here!)\n\nQuick navigation guide\nto all workflow docs", fillcolor=lightyellow];
+        todo [label="TODO-MASTER.md\n\nCurrent project state\nActive epics\nNext priorities", fillcolor=lightcyan];
+    }
+
+    // Core documents
+    subgraph cluster_core {
+        label="Core Workflow Documents";
+        style=filled;
+        fillcolor=lightblue;
+
+        dot_file [label="WORKFLOW.dot\n\nMachine-readable\nGraphViz source\n(Edit this to change workflow)", fillcolor=white];
+
+        visuals [label="WORKFLOW.svg/png/pdf\n\nVisual diagrams\nGenerated from .dot\n(Don't edit directly)", fillcolor=lightsteelblue];
+
+        guide [label="WORKFLOW-GUIDE.md\n\n15,000+ words\nComprehensive narrative\nAll 15 phases explained\nExamples & best practices", fillcolor=mistyrose];
+
+        checklist [label="WORKFLOW-CHECKLIST.md\n\nPrint-friendly\nQuick reference\nSession checklist\nCommand cheat sheet", fillcolor=lightgoldenrodyellow];
+    }
+
+    // Supporting docs
+    subgraph cluster_support {
+        label="Supporting Documentation";
+        style=filled;
+        fillcolor=lavender;
+
+        viz_guide [label="WORKFLOW-VISUALIZATION.md\n\nHow to generate diagrams\nGraphViz usage\nEditing guide\nTroubleshooting", fillcolor=wheat];
+
+        impl_summary [label="IMPLEMENTATION-SUMMARY.md\n\nSSE implementation recap\nSession-specific summary\nExample of session output", fillcolor=lightpink];
+
+        sse_doc [label="SSE-IMPLEMENTATION.md\n\nTechnical deep-dive\nSSE architecture\nBackend requirements", fillcolor=lightcoral];
+    }
+
+    // Skills directory
+    subgraph cluster_skills {
+        label="Skills Repository";
+        style=filled;
+        fillcolor=lightyellow;
+
+        global_skills [label="~/.claude/skills/\n\nGlobal development skills\n- go-development/\n- python-development/\n- typescript-development/\n- docker-deployment/\n- security-audit/\n- testing-protocols/", shape=folder, fillcolor=lightgoldenrodyellow];
+
+        local_config [label="./project-plan/.claude/\n\nLocal project config\n- settings.json\n- epic-templates/\n- conventions.md", shape=folder, fillcolor=lightcyan];
+    }
+
+    // Relationships - Entry point
+    readme -> todo [label="1. Check\nproject state", color=green, penwidth=2];
+    readme -> checklist [label="2. Daily\nreference", color=green, penwidth=2];
+    readme -> guide [label="3. Deep\ndive", color=blue];
+    readme -> visuals [label="Visual\noverview", color=blue];
+
+    // Relationships - Generation flow
+    dot_file -> visuals [label="generate\n(dot command)", style=dashed, color=orange];
+    viz_guide -> dot_file [label="explains\nhow to edit", style=dotted];
+    viz_guide -> visuals [label="explains\nhow to generate", style=dotted];
+
+    // Relationships - Content flow
+    guide -> checklist [label="distilled into\nquick reference", style=dashed];
+    dot_file -> guide [label="documented\nin detail", style=dashed];
+
+    // Relationships - Usage
+    checklist -> guide [label="references\nfor details", style=dotted];
+    guide -> global_skills [label="invokes\nwhen needed", style=dotted, color=purple];
+    guide -> local_config [label="uses\nproject config", style=dotted, color=purple];
+
+    // Relationships - Examples
+    impl_summary -> guide [label="real example\nof session", style=dotted];
+    sse_doc -> guide [label="technical\ndeep-dive example", style=dotted];
+
+    // User journey paths
+    subgraph cluster_journeys {
+        label="User Journeys";
+        style=dotted;
+        fillcolor=white;
+
+        journey1 [label="Visual Learner:\nREADME → WORKFLOW.svg", shape=note, fillcolor=lightyellow];
+        journey2 [label="Detail Seeker:\nREADME → WORKFLOW-GUIDE.md", shape=note, fillcolor=lightyellow];
+        journey3 [label="Daily Developer:\nTODO-MASTER → CHECKLIST", shape=note, fillcolor=lightyellow];
+        journey4 [label="Workflow Editor:\nWORKFLOW.dot → VISUALIZATION guide", shape=note, fillcolor=lightyellow];
+    }
+
+    // Legend
+    subgraph cluster_legend {
+        label="Legend";
+        style=solid;
+        fillcolor=white;
+
+        leg_green [label="Primary Path", color=green, penwidth=2];
+        leg_blue [label="Secondary Path", color=blue];
+        leg_orange [label="Generation", color=orange, style=dashed];
+        leg_dotted [label="Reference", style=dotted];
+        leg_purple [label="External Dependency", color=purple, style=dotted];
+    }
+
+    // Document recommendations
+    subgraph cluster_recommendations {
+        label="Document Recommendations";
+        style=solid;
+        fillcolor=white;
+
+        rec1 [label="New to project?\nStart: README → TODO-MASTER → WORKFLOW.svg", shape=note, fillcolor=lightgreen];
+        rec2 [label="Starting work session?\nStart: TODO-MASTER → CHECKLIST", shape=note, fillcolor=lightgreen];
+        rec3 [label="Need detailed explanation?\nUse: WORKFLOW-GUIDE.md", shape=note, fillcolor=lightcyan];
+        rec4 [label="Want to modify workflow?\nEdit: WORKFLOW.dot, Read: VISUALIZATION guide", shape=note, fillcolor=lightpink];
+    }
+}

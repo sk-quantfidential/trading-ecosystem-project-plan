@@ -15,8 +15,12 @@
 - **Core Services Phase**: 0 of 10 milestones completed
 - **Observability & Integration Phase**: 0 of 8 milestones completed
 
-**Current Milestone**: TSE-0001.5 (Market Data Foundation) - Ready to start
+**Current Milestone**: TSE-0001.5 (Market Data Foundation) - Ready to start (TSE-0001), TSE-0002.1 (Topology Proto Schema) - Ready to start (TSE-0002)
 **Completed**: TSE-0001.4 (audit) ✅, TSE-0001.4.1 (custodian) ✅, TSE-0001.4.2 (exchange) ✅, TSE-0001.4.3 (market-data) ✅, TSE-0001.4.4 (risk-monitor) ✅, TSE-0001.4.5 (trading-system-engine) ✅, TSE-0001.4.6 (test-coordinator) ✅, TSE-0001.12.0 (instance naming) ✅
+
+**Active Epics**:
+- epic-TSE-0001: Foundation Services & Infrastructure (In Progress)
+- epic-TSE-0002: Network Topology Visualization (Not Started)
 
 ---
 
@@ -1078,3 +1082,218 @@ All 8 services successfully integrated with data adapters following Clean Archit
   - test-coordinator: 8087:8080, 50055:50051
 - **Benefits**: Simplified templates, consistent Docker patterns, easier multi-instance scaling
 
+---
+
+## epic-TSE-0002: Network Topology Visualization
+
+**Goal**: Enable simulator-ui-js to visualize real-time network topology from audit-correlator, showing service nodes with health status and directional connections using D3.js force-directed graph.
+
+**Status**: Not Started
+**Start Date**: 2025-10-25
+**Target Completion**: TBD
+**Duration**: 9 weeks
+
+### Progress Summary
+- **Topology API Phase**: 0 of 6 milestones completed
+- **UI Visualization Phase**: 0 of 2 milestones completed
+
+**Current Milestone**: TSE-0002.1 (Topology Proto Schema) - Ready to start
+
+---
+
+## epic-TSE-0002 Milestones
+
+### 📊 Topology API Phase
+
+#### Milestone TSE-0002.1: Topology Proto Schema Definition
+**Status**: Not Started
+**Components**: protobuf-schemas
+**Goal**: Define gRPC API contract for topology service
+**Duration**: 1 week
+
+**Tasks**:
+- [ ] Create `audit/v1/topology_service.proto`
+- [ ] Define `TopologyService` with 5 RPCs (GetTopologyStructure, GetNodeMetadata, GetEdgeMetadata, StreamTopologyChanges, StreamMetricsUpdates)
+- [ ] Define message types: NodeSummary, EdgeSummary, NodeMetadata, EdgeMetadata
+- [ ] Define enums: NodeStatus (LIVE/DEGRADED/DEAD), EdgeStatus (ACTIVE/DEGRADED/FAILED), ConnectionType (GRPC/HTTP/DATA_FLOW)
+- [ ] Define streaming messages: TopologyChange (oneof for node/edge events), MetricsUpdate
+- [ ] Generate Go and TypeScript client libraries
+- [ ] Validate proto schema with buf lint
+
+**BDD Acceptance**: Proto schema compiles, generates clients for Go and TypeScript, passes buf validation
+
+**Dependencies**: None
+
+---
+
+#### Milestone TSE-0002.2: Topology Domain Model
+**Status**: Not Started
+**Components**: audit-correlator-go
+**Goal**: Implement pure domain entities and services for topology tracking
+**Duration**: 1 week
+
+**Tasks**:
+- [ ] Create domain entities: ServiceNode, ServiceConnection, NetworkTopology (internal/domain/entities/topology.go)
+- [ ] Create value objects: NodeMetadata, EdgeMetadata, TopologyFilters
+- [ ] Create domain service: TopologyTracker interface (register/deregister nodes/connections, query topology)
+- [ ] Implement NodeStatus and EdgeStatus domain logic
+- [ ] Unit tests: Test entity behavior (no mocks, pure domain logic)
+- [ ] Validate Clean Architecture: Zero external dependencies in domain layer
+
+**BDD Acceptance**: Domain model compiles, all unit tests pass, no infrastructure dependencies
+
+**Dependencies**: TSE-0002.1 (Proto schema for reference only, not imported in domain)
+
+---
+
+#### Milestone TSE-0002.3: Topology Application Layer
+**Status**: Not Started
+**Components**: audit-correlator-go
+**Goal**: Implement use cases and ports for topology operations
+**Duration**: 1 week
+
+**Tasks**:
+- [ ] Create use cases: GetTopologyStructureUseCase, GetNodeMetadataUseCase, GetEdgeMetadataUseCase (internal/application/usecases/topology/)
+- [ ] Create streaming use cases: StreamTopologyChangesUseCase, StreamMetricsUpdatesUseCase
+- [ ] Define ports: TopologyRepository, MetadataRepository, TopologyChangePublisher, MetricsCollector (internal/domain/ports/topology.go)
+- [ ] Implement use case logic with dependency on ports only
+- [ ] Unit tests: Test use cases with mock ports
+- [ ] Validate: Application layer depends only on domain layer
+
+**BDD Acceptance**: Use cases implement business logic, tests pass with mocked ports, dependency rule enforced
+
+**Dependencies**: TSE-0002.2 (Domain model)
+
+---
+
+#### Milestone TSE-0002.4: Topology Infrastructure
+**Status**: Not Started
+**Components**: audit-correlator-go
+**Goal**: Implement infrastructure adapters for service discovery and metrics
+**Duration**: 1 week
+
+**Tasks**:
+- [ ] Create ServiceDiscoveryTopologyAdapter: Watches service discovery, updates TopologyTracker (internal/infrastructure/topology/service_discovery_adapter.go)
+- [ ] Create PrometheusMetricsScraper: Scrapes Prometheus for node health metrics (internal/infrastructure/topology/metrics_scraper.go)
+- [ ] Implement TopologyChangePublisher with Go channels or Redis PubSub
+- [ ] Implement MetricsCollector with periodic Prometheus queries
+- [ ] Integration tests: Test adapters against real service discovery and Prometheus
+- [ ] Validate: Infrastructure implements ports from application layer
+
+**BDD Acceptance**: Service discovery changes populate topology, Prometheus metrics collected, integration tests pass
+
+**Dependencies**: TSE-0002.3 (Application layer ports)
+
+---
+
+#### Milestone TSE-0002.5: Topology gRPC Service
+**Status**: Not Started
+**Components**: audit-correlator-go
+**Goal**: Implement gRPC presentation layer for topology API
+**Duration**: 1 week
+
+**Tasks**:
+- [ ] Create TopologyServiceServer implementing generated proto interface (internal/presentation/grpc/services/topology_service.go)
+- [ ] Implement GetTopologyStructure RPC: Convert domain to proto, apply filters
+- [ ] Implement GetNodeMetadata RPC: Support empty node_ids = all nodes, configurable fields
+- [ ] Implement GetEdgeMetadata RPC: Batch fetch edge metadata
+- [ ] Implement StreamTopologyChanges RPC: Server-side streaming, enforce 1s minimum interval
+- [ ] Implement StreamMetricsUpdates RPC: Server-side streaming, validate interval >= 1 second
+- [ ] Register service in main.go gRPC server
+- [ ] Unit tests: Test proto conversion, error handling, streaming logic
+- [ ] Manual test: grpcurl calls to all endpoints
+
+**BDD Acceptance**: All gRPC endpoints functional, streaming works, tests pass, manual validation successful
+
+**Dependencies**: TSE-0002.1 (Proto schema), TSE-0002.3 (Use cases), TSE-0002.4 (Infrastructure)
+
+---
+
+#### Milestone TSE-0002.6: Topology Data Persistence
+**Status**: Not Started
+**Components**: audit-data-adapter-go
+**Goal**: Implement repository adapters for topology storage
+**Duration**: 1 week
+
+**Tasks**:
+- [ ] Create PostgreSQL schema: audit.topology_snapshots, audit.node_metadata, audit.edge_metadata tables
+- [ ] Create PostgreSQLTopologyRepository implementing TopologyRepository port (pkg/repositories/postgres_topology_repo.go)
+- [ ] Create RedisTopologyCache for fast current topology reads (pkg/repositories/redis_topology_cache.go)
+- [ ] Implement SaveTopologySnapshot: Write to PostgreSQL + Redis cache
+- [ ] Implement GetNodeMetadata: Redis cache with PostgreSQL fallback
+- [ ] Implement GetEdgeMetadata: Redis cache with PostgreSQL fallback
+- [ ] Integration tests: Test against test PostgreSQL and Redis instances
+- [ ] Validate Clean Architecture: Adapters implement domain ports
+
+**BDD Acceptance**: Topology persisted to PostgreSQL, cached in Redis, queries fast, integration tests pass
+
+**Dependencies**: TSE-0002.3 (Application layer ports define repository interfaces)
+
+---
+
+### 🎨 UI Visualization Phase
+
+#### Milestone TSE-0002.7: Simulator UI Network Visualization
+**Status**: Not Started
+**Components**: simulator-ui-js
+**Goal**: Implement D3.js force-directed graph with real-time topology updates
+**Duration**: 2 weeks
+
+**Tasks**:
+- [ ] Create gRPC-Web client: TopologyClient with all 5 service methods (src/infrastructure/grpc/topology_client.ts)
+- [ ] Create domain models: ServiceNode, ServiceEdge, NetworkTopology (src/domain/models/topology.ts)
+- [ ] Create view model: TopologyViewModel to convert proto to D3.js graph format (src/application/topology/topology_view_model.ts)
+- [ ] Create TopologyManager: Orchestrates initial load, streaming updates, metrics subscription (src/application/topology/topology_manager.ts)
+- [ ] Implement D3ForceGraph: D3.js force simulation, directional arrows, node colors by status (src/app/components/topology/D3ForceGraph.tsx)
+- [ ] Implement NetworkDiagramPage: React container with D3 SVG (src/app/components/topology/NetworkDiagramPage.tsx)
+- [ ] Implement TopologyControls: Zoom, pan, filter, layout controls
+- [ ] Implement TopologyLegend: Status colors, connection types
+- [ ] Handle real-time updates: Node added/removed/status changed, edge updates
+- [ ] Optimize metrics streaming: Only visible nodes, update on viewport change
+- [ ] Unit tests: Test view model transformations, manager logic
+- [ ] Integration tests: Mock gRPC responses, verify D3.js updates
+- [ ] Manual testing: Run against real audit-correlator service
+
+**BDD Acceptance**: Network diagram renders, nodes colored by status, real-time updates work, viewport optimization functional
+
+**Dependencies**: TSE-0002.5 (Topology gRPC service), TSE-0002.1 (Proto schema for TypeScript codegen)
+
+---
+
+#### Milestone TSE-0002.8: Integration Testing & Polish
+**Status**: Not Started
+**Components**: All (end-to-end)
+**Goal**: Validate complete topology visualization flow and polish UX
+**Duration**: 1 week
+
+**Tasks**:
+- [ ] End-to-end test: Start all services, verify topology appears in UI
+- [ ] Test node status changes: Stop service, verify node turns red
+- [ ] Test connection failures: Simulate network issue, verify edge status
+- [ ] Test real-time metrics: Verify metrics update every 1 second
+- [ ] Test viewport optimization: Verify metrics subscription changes on pan/zoom
+- [ ] Test node click: Verify metadata panel appears with correct data
+- [ ] Test edge click: Verify connection details panel
+- [ ] Performance testing: 50+ nodes, verify acceptable rendering performance
+- [ ] UX polish: Smooth transitions, loading states, error handling
+- [ ] Documentation: Update README files with topology API usage
+- [ ] Create PR documentation for all modified components
+
+**BDD Acceptance**: All tests pass, topology visualization smooth and responsive, documentation complete
+
+**Dependencies**: TSE-0002.7 (UI implementation), TSE-0002.5 (gRPC service)
+
+---
+
+## Epic Summary
+
+**Modified Components**:
+1. protobuf-schemas (new topology_service.proto)
+2. audit-correlator-go (domain, application, infrastructure, presentation layers)
+3. audit-data-adapter-go (new topology repository)
+4. simulator-ui-js (new network visualization feature)
+
+**Architecture Pattern**: Clean Architecture enforced across all layers
+**Testing**: Unit tests (domain), integration tests (infrastructure), e2e tests (full stack)
+**Duration**: 9 weeks total
+**Next Epic**: TSE-0003 (Chaos Control APIs) - Deferred

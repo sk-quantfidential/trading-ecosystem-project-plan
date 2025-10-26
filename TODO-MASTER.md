@@ -1084,19 +1084,247 @@ All 8 services successfully integrated with data adapters following Clean Archit
 
 ---
 
-## epic-TSE-0002: Network Topology Visualization
+## epic-TSE-0002: Connect Protocol Rollout
+
+**Goal**: Implement Connect protocol (browser-compatible gRPC) across all services with gRPC endpoints, enabling direct browser-to-service RPC calls without grpc-web proxies.
+
+**Status**: In Progress
+**Start Date**: 2025-10-20
+**Target Completion**: 2025-11-15
+
+### Progress Summary
+- **Go Services**: 1 of 4 services completed (market-data-simulator-go ✅)
+- **Python Services**: 1 of 1 service with gRPC completed (risk-monitor-py ✅)
+- **Pattern Established**: Replicable implementation pattern for remaining services
+- **Total**: 2 of 5 services complete (40%)
+
+**Current Status**: Python implementation complete, Go services next
+
+**Active Milestones**:
+- TSE-0002.Go-2: exchange-simulator-go Connect implementation (Ready to start)
+- TSE-0002.Go-3: custodian-simulator-go Connect implementation (Ready to start)
+- TSE-0002.Go-4: audit-correlator-go Connect implementation (Ready to start)
+
+---
+
+## epic-TSE-0002 Milestones
+
+### 🌐 Go Services Connect Protocol
+
+#### Milestone TSE-0002.Go-1: market-data-simulator-go Connect Implementation
+**Status**: ✅ **COMPLETED** (2025-10-20)
+**Components**: market-data-simulator-go
+**Goal**: Enable browser clients to subscribe to market data streams via Connect protocol
+
+**Completed Tasks**:
+- [x] Add connectrpc.com/connect dependency to go.mod
+- [x] Generate Connect handlers from market_data_service.proto
+- [x] Mount Connect handlers on HTTP mux (/api.v1.MarketDataService)
+- [x] Update CORS configuration for Connect protocol headers
+- [x] Validate dual protocol operation (gRPC + Connect HTTP)
+- [x] Test browser client connectivity
+
+**Deliverables**:
+- ✅ Connect protocol support for MarketDataService
+- ✅ Dual protocol architecture (native gRPC + Connect HTTP)
+- ✅ CORS headers configured (Connect-Protocol-Version, Connect-Timeout-Ms)
+- ✅ All existing tests passing (no regressions)
+
+**BDD Acceptance**: ✅ Browser clients can call MarketDataService RPCs via Connect protocol. Service maintains backward compatibility with existing gRPC clients.
+
+**Dependencies**: TSE-0001.3b (Go Services gRPC Integration)
+
+---
+
+#### Milestone TSE-0002.Go-2: exchange-simulator-go Connect Implementation
+**Status**: Not Started
+**Components**: exchange-simulator-go
+**Goal**: Enable browser clients to interact with exchange APIs via Connect protocol
+
+**Tasks**:
+- [ ] Add connectrpc.com/connect dependency
+- [ ] Generate Connect handlers from exchange service protos
+- [ ] Mount Connect handlers on HTTP mux
+- [ ] Update CORS configuration
+- [ ] Validate dual protocol operation
+- [ ] Test browser client connectivity
+
+**BDD Acceptance**: Browser clients can call ExchangeService RPCs via Connect protocol
+
+**Dependencies**: TSE-0001.3b (Go Services gRPC Integration), TSE-0002.Go-1 (Pattern established)
+
+---
+
+#### Milestone TSE-0002.Go-3: custodian-simulator-go Connect Implementation
+**Status**: Not Started
+**Components**: custodian-simulator-go
+**Goal**: Enable browser clients to interact with custodian APIs via Connect protocol
+
+**Tasks**:
+- [ ] Add connectrpc.com/connect dependency
+- [ ] Generate Connect handlers from custodian service protos
+- [ ] Mount Connect handlers on HTTP mux
+- [ ] Update CORS configuration
+- [ ] Validate dual protocol operation
+- [ ] Test browser client connectivity
+
+**BDD Acceptance**: Browser clients can call CustodianService RPCs via Connect protocol
+
+**Dependencies**: TSE-0001.3b (Go Services gRPC Integration), TSE-0002.Go-1 (Pattern established)
+
+---
+
+#### Milestone TSE-0002.Go-4: audit-correlator-go Connect Implementation
+**Status**: Not Started
+**Components**: audit-correlator-go
+**Goal**: Enable browser clients to visualize topology and audit data via Connect protocol
+
+**Tasks**:
+- [ ] Add connectrpc.com/connect dependency
+- [ ] Generate Connect handlers from topology_service.proto and audit protos
+- [ ] Mount Connect handlers on HTTP mux
+- [ ] Update CORS configuration
+- [ ] Validate dual protocol operation
+- [ ] Test simulator-ui-js connectivity
+
+**BDD Acceptance**: simulator-ui-js can call TopologyService and AuditService RPCs via Connect protocol
+
+**Dependencies**: epic-TSE-0002 (Network Topology Visualization), TSE-0002.Go-1 (Pattern established)
+
+---
+
+### 🐍 Python Services Connect Protocol
+
+#### Milestone TSE-0002.Python-1: risk-monitor-py Connect Implementation
+**Status**: ✅ **COMPLETED** (2025-10-26)
+**Components**: risk-monitor-py
+**Goal**: Enable browser clients to access risk analytics via Connect protocol
+
+**Completed Tasks**:
+- [x] Add connect-python>=0.5.0 dependency to pyproject.toml
+- [x] Create AnalyticsConnectAdapter wrapping RiskAnalyticsService
+- [x] Implement 3 active RPCs (GetRiskMetrics, GetPortfolioRiskMetrics, RunStressTests)
+- [x] Return UNIMPLEMENTED for 4 unimplemented RPCs
+- [x] Mount Connect ASGI app on FastAPI at /api.v1.AnalyticsService
+- [x] Update CORS middleware for Connect protocol headers
+- [x] Generate Connect handlers in protobuf-schemas
+- [x] Validate 77/78 unit tests passing
+- [x] Create PR documentation
+
+**Deliverables**:
+- ✅ Connect protocol support for AnalyticsService
+- ✅ AnalyticsConnectAdapter (158 lines) with error handling
+- ✅ FastAPI integration with graceful fallback
+- ✅ Dual protocol architecture (gRPC port 50056 + Connect HTTP port 8086)
+- ✅ CORS configuration with Connect headers
+- ✅ Generated Connect handlers (~26KB)
+- ✅ Comprehensive PR documentation
+
+**BDD Acceptance**: ✅ Browser clients can call AnalyticsService RPCs via Connect protocol without requiring grpc-web proxies. Service maintains backward compatibility with existing gRPC clients.
+
+**Dependencies**: TSE-0001.3c (Python Services gRPC Integration)
+
+**Architecture Pattern**:
+- Adapter pattern: Connect adapter delegates to existing gRPC service
+- Clean separation: presentation/connect/ for Connect-specific code
+- Browser compatibility: Standard HTTP/1.1 or HTTP/2, no proxy required
+- Future migration ready: Swap adapter without changing other layers
+
+---
+
+#### Milestone TSE-0002.Python-2: trading-system-engine-py Connect Implementation
+**Status**: Deferred - Awaiting gRPC Implementation
+**Components**: trading-system-engine-py
+**Goal**: Enable browser clients to interact with trading engine via Connect protocol
+
+**Prerequisites**:
+- ⏳ trading-system-engine-py needs gRPC service implementation first
+- 📋 Will follow risk-monitor-py Connect pattern once gRPC available
+
+**Planned Tasks**:
+- [ ] Implement gRPC service for trading-system-engine-py (prerequisite)
+- [ ] Add connect-python>=0.5.0 dependency
+- [ ] Create Connect adapter wrapping gRPC service
+- [ ] Mount Connect ASGI app on FastAPI
+- [ ] Update CORS configuration
+- [ ] Validate tests passing
+
+**BDD Acceptance**: Browser clients can call TradingSystemEngine RPCs via Connect protocol
+
+**Dependencies**: trading-system-engine-py gRPC implementation (not yet started)
+
+---
+
+#### Milestone TSE-0002.Python-3: test-coordinator-py Connect Implementation
+**Status**: Deferred - Awaiting gRPC Implementation
+**Components**: test-coordinator-py
+**Goal**: Enable browser clients to control test scenarios via Connect protocol
+
+**Prerequisites**:
+- ⏳ test-coordinator-py needs gRPC service implementation first
+- 📋 Will follow risk-monitor-py Connect pattern once gRPC available
+
+**Planned Tasks**:
+- [ ] Implement gRPC service for test-coordinator-py (prerequisite)
+- [ ] Add connect-python>=0.5.0 dependency
+- [ ] Create Connect adapter wrapping gRPC service
+- [ ] Mount Connect ASGI app on FastAPI
+- [ ] Update CORS configuration
+- [ ] Validate tests passing
+
+**BDD Acceptance**: Browser clients can control test scenarios via Connect protocol
+
+**Dependencies**: test-coordinator-py gRPC implementation (not yet started)
+
+---
+
+## Epic TSE-0002 Summary
+
+**Status**: In Progress (2 of 5 services complete)
+**Completion**: 40%
+
+**Completed Services**: 2
+1. ✅ market-data-simulator-go (Go)
+2. ✅ risk-monitor-py (Python)
+
+**Ready to Implement**: 2 Go services
+3. ⏭️ exchange-simulator-go (Go) - Pattern established
+4. ⏭️ custodian-simulator-go (Go) - Pattern established
+5. ⏭️ audit-correlator-go (Go) - Depends on topology service
+
+**Deferred**: 2 Python services (awaiting gRPC)
+- ⏳ trading-system-engine-py (needs gRPC first)
+- ⏳ test-coordinator-py (needs gRPC first)
+
+**Architecture Benefits**:
+- ✅ Browser-compatible gRPC without proxies
+- ✅ Dual protocol support (native gRPC + Connect HTTP)
+- ✅ No code duplication (adapter pattern)
+- ✅ Backward compatible (existing clients unaffected)
+- ✅ Future-proof (easy OpenTelemetry migration)
+
+**Next Steps**:
+1. Implement Connect for exchange-simulator-go
+2. Implement Connect for custodian-simulator-go
+3. Implement Connect for audit-correlator-go (after topology service)
+4. Plan gRPC implementation for remaining Python services
+
+---
+
+## epic-TSE-0003: Network Topology Visualization (Backend Complete)
 
 **Goal**: Enable simulator-ui-js to visualize real-time network topology from audit-correlator, showing service nodes with health status and directional connections using D3.js force-directed graph.
 
-**Status**: ✅ **COMPLETED** - 2025-10-25
+**Status**: ✅ **BACKEND COMPLETED** - 2025-10-25 (UI work deferred)
 **Start Date**: 2025-10-25
-**Completion Date**: 2025-10-25
+**Completion Date**: 2025-10-25 (backend only)
 **Duration**: 1 day (accelerated completion)
 
 ### Progress Summary
 - **Topology API Phase**: 5 of 5 milestones completed ✅
 - **gRPC Presentation Layer**: 1 milestone completed ✅
-- **Total**: All backend components complete, ready for Docker deployment
+- **UI Visualization**: Deferred to future work
+- **Total Backend**: All backend components complete, ready for UI implementation
 
 **Completed Milestones**: All backend milestones implemented in single day
 

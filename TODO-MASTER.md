@@ -1,5 +1,9 @@
 # Trading Ecosystem - Master TODO
 
+**Note**: Completed milestones are archived in [TODO-HISTORY-MASTER.md](TODO-HISTORY-MASTER.md)
+
+---
+
 ## epic-TSE-0001: Foundation Services & Infrastructure
 
 **Goal**: Establish minimal viable services with clean architecture, Docker deployment, and BDD testing to enable rapid future development.

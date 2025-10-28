@@ -640,6 +640,68 @@
 
 ---
 
+#### Milestone: TODO Journal System Implementation
+**Status**: ✅ **COMPLETED** (2025-10-28)
+**Type**: Process Improvement (Chore)
+**Branch**: `chore/epic-TSE-0001-todo-journal-system`
+**Components**: All 9 repositories
+**Goal**: Archive completed milestones and keep TODO files focused on active work
+
+**Completed Tasks**:
+- [x] Created TODO-HISTORY-MASTER.md in project-plan (archives TSE-0001 and TSE-0002 completed milestones)
+- [x] Updated TODO-MASTER.md with reference to history file
+- [x] Removed redundant TODO.md from project-plan (coordination repo only needs TODO-MASTER.md)
+- [x] Fixed create-pr.sh bug (branch slash → dash conversion for PR file matching)
+- [x] Updated validation scripts to accept TODO.md OR TODO-MASTER.md
+- [x] Updated ~/.claude/skills/foundations/git_quality_standards/ with new scripts
+- [x] Rolled out validation script updates to all 9 repositories
+- [x] Added '## What Changed' sections to 11 PR documentation files
+- [x] Created comprehensive PR documentation for rollout pattern
+
+**Files Created**:
+- `TODO-HISTORY-MASTER.md` - Archives ~400 lines of completed milestones (TSE-0001 Foundation + TSE-0002 Topology)
+- PR documentation: `docs/prs/chore-epic-TSE-0001-todo-journal-system.md`
+
+**Files Modified**:
+- `TODO-MASTER.md` - Added history reference header, remains focused on active/future work
+- `.claude/plugins/git_quality_standards/scripts/validate-repository.sh` - Check for TODO.md OR TODO-MASTER.md
+- `.claude/plugins/git_quality_standards/scripts/pre-push-hook.sh` - Detect and validate either TODO file
+- `scripts/validate-all.sh` - Accept either TODO.md or TODO-MASTER.md
+- `scripts/validate-repository.sh` - Check for TODO.md OR TODO-MASTER.md
+- `scripts/pre-push-hook.sh` - Detect and validate either TODO file
+- `scripts/create-pr.sh` - Fixed branch-to-PR-file matching (slash → dash)
+
+**Pattern Established**:
+- **Project-plan**: Uses TODO-MASTER.md for cross-component coordination
+- **Component repos**: Use TODO.md for component-specific milestones
+- **History files**: TODO-HISTORY-MASTER.md (project-plan) and TODO-HISTORY.md (components)
+- **Validation**: All scripts now accept either TODO.md or TODO-MASTER.md
+
+**Rollout Status**:
+All 9 repositories updated:
+- ✅ project-plan (template implementation)
+- ✅ audit-correlator-go (validation scripts + PR docs)
+- ✅ custodian-simulator-go (validation scripts)
+- ✅ exchange-simulator-go (validation scripts + PR docs)
+- ✅ market-data-simulator-go (validation scripts + PR docs)
+- ✅ orchestrator-docker (validation scripts)
+- ✅ protobuf-schemas (validation scripts)
+- ✅ risk-monitor-py (validation scripts + PR docs)
+- ✅ trading-system-engine-py (validation scripts + PR docs)
+
+**Benefits**:
+- ✅ **Focused TODO files**: Only active/future work visible (TODO-MASTER.md reduced from 1,591 to ~1,200 lines)
+- ✅ **Historical record**: Completed work preserved with full context (~400 lines archived)
+- ✅ **Better navigation**: Smaller files, faster to scan and understand current state
+- ✅ **Clear status**: Obvious separation between done (history) and todo (active)
+- ✅ **Consistent pattern**: Same structure replicated across all repositories
+- ✅ **Improved validation**: Scripts no longer report false warnings for TODO-MASTER.md
+- ✅ **Fixed PR workflow**: create-pr.sh now correctly matches branch names to PR files
+
+**BDD Acceptance**: ✅ **VALIDATED** - TODO-MASTER.md focuses on active work, TODO-HISTORY-MASTER.md preserves completed milestones, validation scripts accept both file patterns, PR workflow operates correctly
+
+---
+
 ### 📊 Core Services Phase
 
 #### Milestone TSE-0001.5: Market Data Foundation

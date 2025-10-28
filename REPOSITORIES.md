@@ -3,7 +3,7 @@
 ## Overview
 **Solution Name**: Trading Ecosystem
 **Architecture Style**: Microservices
-**Component Count**: 9
+**Component Count**: 10
 
 ## Core Services
 
@@ -68,6 +68,13 @@
 - **Purpose**: Core trading engine handling order management and execution
 - **Tech Stack**: Python
 - **Epic Participation**: TBD
+- **Status**: Active
+
+### simulator-ui-js
+- **Repository**: ./simulator-ui-js
+- **Purpose**: Web-based UI for visualizing network topology and controlling chaos scenarios
+- **Tech Stack**: TypeScript, React, Next.js, D3.js, gRPC-Web
+- **Epic Participation**: TSE-0002 (Network Topology Visualization)
 - **Status**: Active
 
 ## Integration Map
